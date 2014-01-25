@@ -1,0 +1,27 @@
+#
+#  A Simple Makefile for View3D (Windows version)
+#
+obj   = ctrans.obj getdat.obj heap.obj misc.obj polygn.obj readvf.obj savevf.obj test3d.obj v3main.obj view3d.obj viewobs.obj viewpp.obj viewunob.obj
+#
+progs = View3D
+#
+headers = prtyp.h types.h vglob.h view3d.h vxtrn.h
+#
+defines = /D_CRT_SECURE_NO_DEPRECATE
+flags = /Wall
+cflags = $(defines) $(flags)
+
+.PHONY: all
+all: $(obj) $(progs)
+
+$(obj): $*.c $(headers)
+	cl /c $*.c /Fo$*.obj $(cflags)
+
+$(progs): $(obj)
+	link.exe /nologo /manifest /out:$@.exe $(obj)
+
+clean:
+	del *.exe
+	del *.obj
+	del *.manifest
+
