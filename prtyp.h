@@ -1,5 +1,8 @@
 /*subfile:  prtyp.h  *********************************************************/
 
+#define PROGRAMSTR "View3D"
+#define VERSIONSTR "4.0.0"
+
 /*  Common Function Prototypes  */
 
 #ifndef COM_FUNCS
@@ -41,8 +44,7 @@ I1 *GetStr( I1 *prompt, I1 *str );
 IX NoYes( I1 *question );
 void Pause( void );
 
-void NxtInit( I1 *file, IX line );
-IX NxtOpen( I1 *file_name, I1 *file, IX line );
+void NxtOpen( I1 *file_name, I1 *file, IX line );
 void NxtClose( void );
 I1 *NxtWord( I1 *str, IX flag, IX maxlen );
 

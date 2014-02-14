@@ -607,22 +607,15 @@ I1 *_nxtbuf;   /* large buffer for NXT input file */
 
 /*  Open file_name as UNXT file.  */
 
-IX NxtOpen( I1 *file_name, I1 *file, IX line )
+void NxtOpen( I1 *file_name, I1 *file, IX line )
 /* file;  source code file name: __FILE__
  * line;  line number: __LINE__ */
   {
-  IX result=0;
-
-  if( _unxt ) error( 3, file, line, "_UNXT already open", "" );
+  if( _unxt )
+    error( 3, file, line, "_UNXT already open", "" );
   _unxt = fopen( file_name, "r" );  /* = NULL if no file */
   if( !_unxt )
-    {
-    error( 2, file, line, "Could not open file: ", file_name, "" );
-    result = 1;
-    }
-
-  return result;
-
+    error( 3, file, line, "Could not open file: ", file_name, "" );
   }  /* end NxtOpen */
 
 /***  NxtClose.c  ************************************************************/

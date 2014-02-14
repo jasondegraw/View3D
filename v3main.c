@@ -18,8 +18,8 @@
 #include "view3d.h"
 #include "prtyp.h"
 
-FILE *_unxt; /* input file */
-FILE *_ulog; /* log file */
+FILE *_unxt = NULL; /* input file */
+FILE *_ulog = NULL; /* log file */
 IX _echo=0;  /* true = echo input file */
 IX _list=0;  /* output control, higher value = more output:
                 0 = summary;
@@ -27,22 +27,44 @@ IX _list=0;  /* output control, higher value = more output:
                 2 = echo input, note calculations;
                 3 = note obstructions. */
 I1 _string[LINELEN];  /* buffer for a character string */
-I1 *methods[7]={"2AI","1AI","2LI","1LI","ALI","Adapt","Blocked"}; /* abbreviations */
+I1 *methods[7] = {"2AI", "1AI", "2LI", "1LI",
+                  "ALI", "Adapt", "Blocked"}; /* abbreviations */
 IX _maxNVT=12;   /* maximum number of temporary polygon overlap vertices */
 
-
+void ReadVF(I1 *fileName, I1 *program, I1 *version, IX *format, IX *encl,
+            IX *didemit, IX *nSrf, R4 *area, R4 *emit, R8 **AF, R4 **F,
+            IX init, IX shape );
+void SaveVF(I1 *fileName, I1 *program, I1 *version, IX format, IX encl,
+            IX didemit, IX nSrf, R4 *area, R4 *emit, R8 **AF, R4 *vtmp);
 void FindFile( I1 *msg, I1 *name, I1 *type );
-void ReadVF( I1 *fileName, I1 *program, I1 *version,
-             IX *format, IX *encl, IX *didemit, IX *nSrf,
-             R4 *area, R4 *emit, R8 **AF, R4 **F, IX init, IX shape );
-void SaveVF( I1 *fileName, I1 *program, I1 *version,
-             IX format, IX encl, IX didemit, IX nSrf,
-             R4 *area, R4 *emit, R8 **AF, R4 *vtmp );
+
+/***  usage  ******************************************************************/
+/*  Describe usage of the program  */
+void usage(FILE *fp)
+{
+  fprintf(fp,
+      "%s, version %s - calculation of view factors between simple polygons\n\n",
+      PROGRAMSTR,VERSIONSTR);
+  fprintf(fp,"usage: %s <input file> <output file>\n", PROGRAMSTR);
+  fputs("Arguments:\n\tinput file     VS3 file to read\n",fp);
+  fputs("\toutput file    View factor file to write\n",fp);
+  //fputs("Options:\n",fp);
+  //fputs("\t-h             Print this help and exit\n",fp);
+} /* end usage */
+
+/***  fileCheck  **************************************************************/
+/*  Check that the named file can be opened in the given mode  */
+IX fileCheck(I1 *filename, I1 *mode)
+{
+  FILE *fp = fopen(filename,mode);
+  if(!fp)
+    return 0;
+  fclose(fp);
+  return 1;
+} /* end fileCheck */
 
 IX main( IX argc, I1 **argv )
   {
-  I1 program[]="View3D";   /* program name */
-  I1 version[]="3.3.1";    /* program version */
   I1 inFile[_MAX_PATH]=""; /* input file name */
   I1 outFile[_MAX_PATH]="";/* output file name */
   I1 fileName[_MAX_PATH];  /* name of file */
@@ -70,6 +92,12 @@ IX main( IX argc, I1 **argv )
   IX encl;         /* 1 = surfaces form enclosure */
   IX n, flag;
 
+  if(argc != 3)
+    {
+      usage(stderr);
+      return EXIT_FAILURE;
+    }
+/*
   if( argc == 1 || argv[1][0] == '?' )
     {
     fputs("\n\
@@ -79,7 +107,42 @@ IX main( IX argc, I1 **argv )
     if( argc > 1 )
       exit( 1 );
     }
-                /* open log file */
+*/
+  /* open log file */
+  //_ulog = fopen( "View3D.log", "w" );
+  _ulog = stdout;
+  if(!_ulog)
+    error(3, __FILE__, __LINE__, "Failed to open VIEW3D.LOG");
+
+  strcpy(inFile, argv[1]);
+  NxtOpen(inFile, __FILE__, __LINE__);
+
+  strcpy(outFile, argv[2]);
+  if(!fileCheck(outFile,"w"))
+    error(3, __FILE__, __LINE__, "Cannot open \"%s\" for output", outFile);
+
+  fprintf(_ulog, "  Program:  %s\n", argv[0] );
+#ifdef _DEBUG
+  fprintf(_ulog, "  Version:  %s DEBUG\n", VERSIONSTR );
+#else
+  fprintf(_ulog, "  Version:  %s\n", VERSIONSTR);
+#endif
+  fprintf(_ulog, "  Created:  %s at %s\n", __DATE__, __TIME__);
+#if( _MSC_VER ) /* Output _MSC_VER */
+  fprintf(_ulog, "  Compiler: Visual C++ Version %d\n", _MSC_FULL_VER );
+#elif __GNUC__
+#if __MINGW64__
+  fprintf(_ulog, "  Compiler: MinGW-w64 GCC %d.%d.%d\n", __GNUC__,
+          __GNUC_MINOR__,__GNUC_PATCHLEVEL__ );
+#elif( __MINGW32__ )
+  fprintf(_ulog, "  Compiler: MinGW GCC %d.%d.%d\n", __GNUC__, __GNUC_MINOR__,
+          __GNUC_PATCHLEVEL__ );
+#else
+  fprintf(_ulog, "  Compiler: GCC %d.%d.%d\n", __GNUC__, __GNUC_MINOR__,
+          __GNUC_PATCHLEVEL__);
+#endif
+#endif
+/*
 #ifdef ANSI
   _ulog = fopen( "View3D.log", "w" );
 #else
@@ -89,28 +152,18 @@ IX main( IX argc, I1 **argv )
 #endif
   if( !_ulog )
     error( 3, __FILE__, __LINE__, "Failed to open VIEW3D.LOG", "" );
+*/
 
 #if( DEBUG > 0 )
   _echo = 1;
 #endif
 
-  fprintf( _ulog, "Program: %s %s\n", program, version );
-  fprintf( _ulog, "Executing: %s\n", argv[0] );
-
-  if( argc > 1 )
-    strcpy( inFile, argv[1] );
-  FindFile( "Enter name of V/S data file", inFile, "r" );
   fprintf( _ulog, "Data file:  %s\n", inFile );
-
-  if( argc > 2 )
-    strcpy( outFile, argv[2] );
-  FindFile( "Enter name of VF output file", outFile, "w" );
   fprintf( _ulog, "Output file:  %s\n", outFile );
 
   time(&bintime);
   curtime = localtime(&bintime);
   fprintf( _ulog, "Time:  %s", asctime(curtime) );
-
   fputs("\n\
   View3D - calculation of view factors between simple polygons.\n\n\
   This software was developed at the National Institute of\n\
@@ -122,7 +175,7 @@ IX main( IX argc, I1 **argv )
   systems. NIST assumes no responsibility whatsoever for their\n\
   use by other parties, and makes no guarantees, expressed or\n\
   implied, about its quality, reliability, or any other\n\
-  characteristic.   We would appreciate acknowledgement if the\n\
+  characteristic.   We would appreciate acknowledgment if the\n\
   software is used. This software can be redistributed and/or\n\
   modified freely provided that any derivative works bear some\n\
   notice that they are derived from it, and any modified\n\
@@ -137,7 +190,7 @@ IX main( IX argc, I1 **argv )
   vfCtrl.maxRecursion = 8;  // maximum number of recursion levels
 
                  /* read Vertex/Surface data file */
-  NxtOpen( inFile, __FILE__, __LINE__ );
+  //NxtOpen( inFile, __FILE__, __LINE__ );
   CountVS3D( title, &vfCtrl );
   fprintf( _ulog, "\nTitle: %s\n", title );
   fprintf( _ulog, "Control values for 3-D view factor calculations:\n" );
@@ -291,7 +344,7 @@ IX main( IX argc, I1 **argv )
     }
 
   if( _list>0 )
-    MemRem( "At start of View3D()" );
+    MemRem("At start of View3D()");
   time1 = CPUtime( 0.0 );
 
   View3D( srf, base, possibleObstr, AF, &vfCtrl );  /*** view factor calculation ***/
@@ -307,8 +360,7 @@ IX main( IX argc, I1 **argv )
 
   if( vfCtrl.row )
     {
-    IX n=vfCtrl.row,
-       m=vfCtrl.col;
+    IX n=vfCtrl.row,m=vfCtrl.col;
     R8 ai=1/area[n];
     R8 F, sum;
     fprintf( _ulog, "\n" );
@@ -453,8 +505,8 @@ IX main( IX argc, I1 **argv )
     ReportAF( nSrf, encl, title, name, area, vtmp, base, AF, 0 );
 
   CPUtime( 0.0 );
-  SaveVF( outFile, program, version, vfCtrl.outFormat, vfCtrl.enclosure,
-          vfCtrl.emittances, nSrf, area, emit, AF, vtmp );
+  SaveVF(outFile, PROGRAMSTR, VERSIONSTR, vfCtrl.outFormat, vfCtrl.enclosure,
+         vfCtrl.emittances, nSrf, area, emit, AF, vtmp);
   sprintf( _string, "%7.2f seconds to write view factors.\n", CPUtime(time1) );
   fputs( _string, stderr );
   fputs( _string, _ulog );
