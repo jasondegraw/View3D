@@ -89,7 +89,7 @@ void CTRotateX( const R8 cosAngle, const R8 sinAngle, R8 t[4][4] )
 
 #if( DEBUG > 0 )
   if( cosAngle*cosAngle + sinAngle*sinAngle - 1.0 > 2.0*FLT_EPSILON )
-    errorf( 2, __FILE__, __LINE__, " invalid angle", "" );
+    error(2, __FILE__, __LINE__, "Invalid angle in CTRotateX");
 #endif
 
   for( j=0; j<4; j++ )
@@ -117,7 +117,7 @@ void CTRotateZ( const R8 cosAngle, const R8 sinAngle, R8 t[4][4] )
 
 #if( DEBUG > 0 )
   if( cosAngle*cosAngle + sinAngle*sinAngle - 1.0 > 2.0*FLT_EPSILON )
-    errorf( 2, __FILE__, __LINE__, " invalid angle", "" );
+    error(2, __FILE__, __LINE__, "Invalid angle in CTRotateZ");
 #endif
 
   for( j=0; j<4; j++ )
@@ -142,7 +142,7 @@ void CTRotateU( const DIRCOS *u, R8 t[4][4] )
 #if( DEBUG > 0 )
   if( fabs( sqrt( u->x*u->x + u->y*u->y + u->z*u->z ) - 1.0 )
       > 2.0 * FLT_EPSILON )
-    errorf( 2, __FILE__, __LINE__, " U is not a unit vector", "" );
+    error(2, __FILE__, __LINE__, "Invalid angle in CTRotateU");
 #endif
 
   v = sqrt( u->x * u->x + u->y * u->y );
@@ -266,16 +266,18 @@ void CoordTrans3D( SRFDAT3D *srf, SRFDATNM *srf1, SRFDATNM *srf2,
     zmax = 0.0;   /* zmax and clipping calculations */
     clip = 0;
     for( n=0; n<nv; n++ )
-      {
+    {
       z[n] = srfOT->v[n].z;
       if( z[n] > zmax )
         zmax = z[n];
       if( z[n] < 0.0 )
+      {
         if( z[n] < eps )    /* round-off errors for co-planar srfs */
           clip = 1;
         else
           z[n]=0.0;
       }
+    }
     srfOT->ztmax = zmax;
     if( clip )    /* this may never be needed for plane polygons */
       {
@@ -305,8 +307,7 @@ void CoordTrans3D( SRFDAT3D *srf, SRFDATNM *srf1, SRFDATNM *srf2,
 void DumpSrf3D( I1 *title, SRFDAT3D *srf )
   {
   IX n;
-  fprintf( _ulog, "%s:  %d  area %.3e\n",
-    title, srf->nr, srf->area );
+  fprintf( _ulog, "%s:  %d  area %.3e\n", title, srf->nr, srf->area );
   DumpVA( " ctd", 1, 3, &srf->ctd.x );
   DumpVA( "  dc", 1, 4, &srf->dc.x );
   for( n=0; n<srf->nv; n++ )
@@ -321,10 +322,9 @@ void DumpSrf3D( I1 *title, SRFDAT3D *srf )
 void DumpSrfNM( I1 *title, SRFDATNM *srf )
   {
   IX n;
-  fprintf( _ulog, "%s:  %d  area %.3e\n",
-    title, srf->nr, srf->area );
-  DumpVA( " ctd", 1, 3, &srf->ctd.x );
-  DumpVA( "  dc", 1, 4, &srf->dc.x );
+  fprintf(_ulog, "%s:  %d  area %.3e\n", title, srf->nr, srf->area);
+  DumpVA(" ctd", 1, 3, &srf->ctd.x);
+  DumpVA("  dc", 1, 4, &srf->dc.x);
   for( n=0; n<srf->nv; n++ )
     DumpVA( "  vt", 1, 3, &srf->v[n].x );
 
@@ -335,16 +335,16 @@ void DumpSrfNM( I1 *title, SRFDATNM *srf )
 /*  Dump SRFDAT3X structure.  */
 
 void Dump3X( I1 *title, SRFDAT3X *srfT )
-  {
+{
   IX n;
-  fprintf( _ulog, "%s:  %d  %.3e  %f\n",
-    title, srfT->nr, srfT->area, srfT->ztmax );
-  DumpVA( " dct", 1, 4, &srfT->dc.x );
-  DumpVA( " ctd", 1, 3, &srfT->ctd.x );
-  for( n=0; n<srfT->nv; n++ )
-    DumpVA( "  vt", 1, 3, &srfT->v[n].x );
+  fprintf(_ulog, "%s:  %d  %.3e  %f\n", title, srfT->nr, srfT->area,
+          srfT->ztmax);
+  DumpVA(" dct", 1, 4, &srfT->dc.x);
+  DumpVA(" ctd", 1, 3, &srfT->ctd.x);
+  for(n=0; n<srfT->nv; n++)
+    DumpVA("  vt", 1, 3, &srfT->v[n].x);
 
-  }  /* end Dump3X */
+}  /* end Dump3X */
 
 /***  DumpVA.c  **************************************************************/
 

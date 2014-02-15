@@ -23,7 +23,7 @@ extern FILE *_ulog; /* log file */
 extern I1 _string[]; /* buffer for a character string */
 extern I1 *methods[]; /* method abbreviations */
 
-IX _row=0;  /* row number; save for errorf() */
+IX _row=0;  /* row number; save for error() */
 IX _col=0;  /* column number; " */
 R8 _sli4;   /* use SLI if rcRatio > 4 and relSep > _sli4 */
 R8 _sai4;   /* use SAI if rcRatio > 4 and relSep > _sai4 */
@@ -195,7 +195,7 @@ void View3D( SRFDAT3D *srf, const IX *base, IX *possibleObstr,
         VECTOR( (&srfN.ctd), (&srfM.ctd), (&vNM) );
         distNM = VLEN( (&vNM) );
         if( distNM < 1.0e-5 * (srfN.rc + srfM.rc) )
-          errorf( 3, __FILE__, __LINE__, "Surfaces have same centroids", "" );
+          error(3,__FILE__,__LINE__,"Surfaces have same centroids in View3D");
 
         nProb = nPossN;
         memcpy( probableObstr+1, possibleObstrN+1, nProb*sizeof(IX) );
@@ -617,65 +617,4 @@ void InitViewMethod( VFCTRL *vfCtrl )
     }
   
   }  /* end InitViewMethod */
-
-/***  errorf.c  **************************************************************/
-
-/*  error messages for view factor calculations  */
-
-IX errorf( IX severity, I1 *file, IX line, ... )
-/* severity;  values 0 - 3 defined below
- * file;      file name: __FILE__
- * line;      line number: __LINE__
- * ...;       string variables (up to 80 char total) */
-  {
-  va_list argp;     /* variable argument list */
-  I1 start[]=" ";
-  I1 *msg, *s;
-  static I1 *head[4] = { "  *** note *** ",
-                         "*** warning ***",
-                         " *** error *** ",
-                         " *** fatal *** " };
-//  I1 name[16];
-  IX n=1;
-
-  if( severity >= 0 )
-    {
-    if( severity>3 ) severity = 3;
-//    PathSplit( file, _string, _string, name, _string );
-    sprintf( _string, "%s  (file %s, line %d)\n", head[severity], sfname( file ), line );
-    fputs( "\n", stderr );
-    fputs( _string, stderr );
-    if( _ulog != NULL && _ulog != stderr )
-      {
-      fputs( _string, _ulog );
-      fflush( _ulog );
-      }
-
-    msg = start;   /* merge message strings */
-    sprintf( _string, "row %d, col %d; ", _row, _col );
-    s = _string;
-    while( *s )
-      s++;
-    va_start( argp, line );
-    while( *msg && n<80 )
-      {
-      while( *msg && n++<80 )
-        *s++ = *msg++;
-      msg = (I1 *)va_arg( argp, I1 * );
-      }
-    *s++ = '\n';
-    *s = '\0';
-    va_end( argp );
-
-    fputs( _string, stderr );
-    if( _ulog != NULL && _ulog != stderr )
-      fputs( _string, _ulog );
-    }
-
-  if( severity>2 ) exit( 1 );
-
-  return 0;
-
-  }  /*  end of errorf  */
-
 

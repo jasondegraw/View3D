@@ -144,7 +144,7 @@ IX PolygonOverlap( const POLY *p1, POLY *p2, const IX savePD, IX freeP2 )
 #if( DEBUG > 1 )
         if( fabs(w) < _epsArea*(a+b+c) )
           {
-          errorf( 1, __FILE__, __LINE__, "small W", "" );
+          error(1, __FILE__, __LINE__, "small W in PolygonOverlap");
           DumpHC( "P1:", p1, p1 );
           DumpHC( "P2:", p2, p2 );
           fprintf( _ulog, "a, b, c, w: %g %g %g %g\n", a, b, c, w );
@@ -153,8 +153,9 @@ IX PolygonOverlap( const POLY *p1, POLY *p2, const IX savePD, IX freeP2 )
           }
 #endif
 #if( DEBUG > 0 )
-        if( w == 0.0 ) errorf( 3, __FILE__, __LINE__,
-          " Would divide by zero (w=0)", "" );
+        if(w == 0.0)
+          error(3, __FILE__, __LINE__,
+                "Division by zero (w=0) in PolygonOverlap");
 #endif
         _rightVrt[nRightVrt].x = _leftVrt[nLeftVrt].x = ( c*b1 - b*c1 ) / w;
         _rightVrt[nRightVrt++].y = _leftVrt[nLeftVrt++].y = ( a*c1 - c*a1 ) / w;
@@ -179,16 +180,16 @@ IX PolygonOverlap( const POLY *p1, POLY *p2, const IX savePD, IX freeP2 )
 //      errorf( 3, __FILE__, __LINE__, "Parameter _maxNVT too small", "" );
     if( nLeftVrt >= _maxNVT )
       {
-      errorf( 2, __FILE__, __LINE__,
-        "Parameter maxV (", IntStr(_maxNVT), ") too small", "" );
+      error(2, __FILE__, __LINE__, 
+                "Parameter maxV (%d) too small in PolygonOverlap",_maxNVT);
       DumpP2D( "Offending Polygon:", nLeftVrt, _leftVrt );
       overlap = -999;
       goto finish;
       }
     if( nRightVrt >= _maxNVT )
       {
-      errorf( 2, __FILE__, __LINE__,
-        "Parameter maxV (", IntStr(_maxNVT), ") too small", "" );
+      error(2, __FILE__, __LINE__, 
+                "Parameter maxV (%d) too small in PolygonOverlap",_maxNVT);
       DumpP2D( "Offending Polygon:", nRightVrt, _rightVrt );
       overlap = -999;
       goto finish;
@@ -433,8 +434,10 @@ void FreePolygons( POLY *first, POLY *last )
   for( pp=first; ; pp=pp->next )
     {
 #if( DEBUG > 0 )
-    if( !pp ) error( 3, __FILE__, __LINE__, "Polygon PP not defined", "" );
-    if( !pp->firstVE ) error( 3, __FILE__, __LINE__, "FirstVE not defined", "" );
+    if( !pp )
+      error(3, __FILE__, __LINE__, "Polygon PP not defined in FreePolygons");
+    if( !pp->firstVE )
+      error(3, __FILE__, __LINE__, "FirstVE not defined in FreePolygons");
 #endif
     pv = pp->firstVE->next;           /* free vertices (circular list) */
     while( pv->next != pp->firstVE )  /* find "end" of vertex list */
@@ -530,8 +533,8 @@ void FreeTmpVertMem( void )
 
 void InitTmpVertMem( void )
   {
-  if( _u ) error( 3, __FILE__, __LINE__,
-    "Temporary vertices already allocated", "" );
+  if( _u )
+    error(3, __FILE__, __LINE__, "Temporary vertices already allocated");
   _leftVrt = Alc_V( 0, _maxNVT, sizeof(VERTEX2D), __FILE__, __LINE__ );
   _rightVrt = Alc_V( 0, _maxNVT, sizeof(VERTEX2D), __FILE__, __LINE__ );
   _tempVrt = Alc_V( 0, _maxNVT, sizeof(VERTEX2D), __FILE__, __LINE__ );
@@ -750,7 +753,8 @@ void DumpHC( I1 *title, const POLY *pfp, const POLY *plp )
     fprintf( _ulog, "  trns %.3g", pp->trns );
     fprintf( _ulog, "  next [%p]", pp->next );
     fprintf( _ulog, "  fve [%p]\n", pp->firstVE );
-    if( ++i >= 100 ) error( 3, __FILE__, __LINE__, "Too many surfaces", "" );
+    if( ++i >= 100 )
+      error(3, __FILE__, __LINE__, "Too many surfaces in DumpHC");
 
     j = 0;
     pv = pp->firstVE;
@@ -758,7 +762,8 @@ void DumpHC( I1 *title, const POLY *pfp, const POLY *plp )
       fprintf( _ulog, "  ve [%p] %10.7f %10.7f %10.7f %10.7f %13.8f\n",
                pv, pv->x, pv->y, pv->a, pv->b, pv->c );
       pv = pv->next;
-      if( ++j >= _maxNVT ) error( 3, __FILE__, __LINE__, "Too many vertices", "" );
+      if( ++j >= _maxNVT )
+        error(3, __FILE__, __LINE__, "Too many vertices in DumpHC");
       } while( pv != pp->firstVE );
 
     if( pp==plp ) break;

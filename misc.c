@@ -1,5 +1,23 @@
-/*subfile:  misc.c  **********************************************************/
-
+/*subfile:  misc.c  ***********************************************************/
+/*                                                                            */
+/*  Copyright (c) 2014 Jason W. DeGraw                                        */
+/*                                                                            */
+/*  This file is part of View3D.                                              */
+/*                                                                            */
+/*  View3D is free software: you can redistribute it and/or modify it         */
+/*  under the terms of the GNU General Public License as published by         */
+/*  the Free Software Foundation, either version 3 of the License, or         */
+/*  (at your option) any later version.                                       */
+/*                                                                            */
+/*  View3D is distributed in the hope that it will be useful, but             */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of                */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU         */
+/*  General Public License for more details.                                  */
+/*                                                                            */
+/*  You should have received a copy of the GNU General Public License         */
+/*  along with View3D.  If not, see <http://www.gnu.org/licenses/>.           */
+/*                                                                            */
+/******************************************************************************/
 /*    utility functions   */
 
 #include <stdio.h>
@@ -21,98 +39,48 @@ extern I1 _string[LINELEN];  /* buffer for ReadXX(); helps debugging */
 
 IX _emode=1;   /* error message mode: 0=logFile, 1=DOS console, 2=Windows */
 
-/***  errora.c  **************************************************************/
 
-/*  Minimal error message - written to .LOG file.  */
 
-void errora( const I1 *head, I1 *message, I1 *source )
-  {
-  if( _ulog )
-    {
-    fputs( head, _ulog );
-    fputs( source, _ulog );
-    fputs( message, _ulog );
-    fflush( _ulog );
-    }
+/***  error  ******************************************************************/
 
-  }  /*  end of errora  */
+/*  Standard error message routine - _ulog MUST be defined.  */
 
-/***  errorb.c  **************************************************************/
-
-/*  Standard error message for console version.  */
-
-void errorb( const I1 *head, I1 *message, I1 *source )
-  {
-  fputs( head, stdout );
-  fputs( message, stdout );
-  errora( head, message, source );
-
-  }  /*  end of errorb  */
-
-/***  error.c  ***************************************************************/
-
-/*  Standard error message routine - select errora, errorb or errorw.
- *  _ulog MUST be defined.  */
-
-IX error( IX severity, I1 *file, IX line, ... )
+IX error(IX severity, I1 *file, IX line, ...)
 /* severity;  values 0 - 3 defined below
  * file;      file name: __FILE__
  * line;      line number: __LINE__
  * ...;       string variables (up to LINELEN characters total) */
-  {
-  I1 message[LINELEN]; /* merged message */
-  I1 source[64];       /* source code info. */
-  va_list argp;        /* variable argument list */
-  I1 start[]=" ";      /* leading blank in message */
-  I1 *msg, *s;
+{
+  va_list args; /* variable argument list */
+  I1* format; /* format string for vprintf */
   static IX count=0;   /* count of severe errors */
   static const I1 *head[4] = { "NOTE", "WARNING", "ERROR", "FATAL" };
-  IX n=1;
 
-  if( severity >= 0 )
-    {
-    if( severity>3 ) severity = 3;
-    if( severity==2 ) count += 1;
-    msg = start;   /* merge message strings */
-    s = message;
-    va_start( argp, line );
-    while( *msg && n<LINELEN )
-      {
-      while( *msg && n++<LINELEN )
-        *s++ = *msg++;
-      msg = (I1 *)va_arg( argp, I1 * );
-      }
-    *s++ = '\n';
-    *s = '\0';
-    va_end( argp );
-
-    sprintf( source, "  (file %s, line %d)\n",
-      sfname( file ), line );
-
-#if( _MSC_VERXXX ) // for Windoows programs
-    if( _emode == 2 )
-      errorw( head[severity], message, source );
-    else
-#endif
-    if( _emode == 1 )
-      errorb( head[severity], message, source );
-    else
-      errora( head[severity], message, source );
-    if( severity>2 )
-      {
-#ifdef _DEBUG
-      Pause();  // hold screen (stdout) display
-#endif
-      if( _ulog )
-        fclose( _ulog );  // exit() closes files
-      exit( 1 );
-      }
-    }
+  if(severity >= 0)
+  {
+    if(severity>3)
+      severity = 3;
+    else if(severity==2)
+      count += 1;
+    //fprintf(stderr, "%s %s (%s,%d): ", PROGRAMNAME, head[severity],
+    //    file, line);
+    fprintf(_ulog, "%s %s (%s,%d): ", PROGRAMSTR, head[severity],
+            file, line);
+    //va_start(args, format);
+    va_start(args,line);
+    format = va_arg(args, char*);
+    //vfprintf(stderr, format, args);
+    vfprintf(_ulog, format, args);
+    va_end(args);
+    if(severity > 2)
+      exit(EXIT_FAILURE);
+      //fputs("\n", stderr);
+    fputs("\n", _ulog);
+  }
   else if( severity < -1 )   /* clear error count */
     count = 0;
 
-  return( count );
-
+  return count;
   }  /*  end error  */
 
 /***  sfname.c  ***************************************************************/
@@ -185,28 +153,6 @@ I1 _dirchr='\\';
 I1 _dirchr='\0';    // this will force a failure
 #endif
 
-/***  errorc.c  **************************************************************/
-
-/*  Minimal error message - avoids recursive call to PathSplit.
- *  An error there will usually result a subsequent error.  */
-
-void errorc( IX severity, I1 *message )
-  {
-  static const I1 *head[4] = { "NOTE", "WARNING", "ERROR", "FATAL" };
-
-  if( severity>3 ) severity = 3;
-  if( _emode < 2 )
-    fprintf( stdout, "%s %s\n", head[severity], message );
-  if( _ulog )
-    {
-    fprintf( _ulog, "%s %s\n", head[severity], message );
-    fflush( _ulog );
-    }
-  if( severity > 2 )
-    exit( 1 );
-
-  }  /*  end of errorc  */
-
 /***  PathMerge.c  ***********************************************************/
 
 /*  Merge full path from its component parts.  */
@@ -218,8 +164,7 @@ void PathMerge( I1 *fullpath, IX szfp, I1 *drv, I1 *path, I1 *name, I1 *ext )
   I1 *c;  // pointer to source string
 
 #if( DEBUG > 0 )
-  if( !fullpath ) errorc( 3, "PathMerge: NULL fullpath" );
-  if( !_dirchr ) errorc( 3, "PathMerge: NULL _dirchr" );
+  
 #endif
 
   if( !fullpath ) return;
@@ -252,7 +197,7 @@ void PathMerge( I1 *fullpath, IX szfp, I1 *drv, I1 *path, I1 *name, I1 *ext )
     fullpath[n] = '\0';
   else
     {
-    errorc( 2, "PathMerge: fullpath overrun" );
+    //errorc( 2, "PathMerge: fullpath overrun" );
     fullpath[szfp-1] = '\0';
     }
 
@@ -289,7 +234,7 @@ void PathSplit( I1 *fullpath, I1 *drv, IX szd, I1 *path, IX szp,
   IX n;  // character count
 
 #if( DEBUG > 0 )
-  if( !fullpath ) errorc( 3, "PathSplit: NULL fullpath" );
+  //if( !fullpath ) error( 3, "PathSplit: NULL fullpath" );
 #endif
 
   c = fullpath;
@@ -299,7 +244,7 @@ void PathSplit( I1 *fullpath, I1 *drv, IX szd, I1 *path, IX szp,
     if( fullpath[1] == ':' )
       {
       if( szd < 3 )
-        errorc( 2, "pathsplit: file drive overrun" );
+        ;//error( 2, "pathsplit: file drive overrun" );
       else
         {
         drv[n++] = *c++;  // copy drive characters
@@ -318,7 +263,7 @@ void PathSplit( I1 *fullpath, I1 *drv, IX szd, I1 *path, IX szp,
       while( c<=p && n<szp )
         path[n++] = *c++;
       if( n == szp )
-        { errorc( 2, "pathsplit: file path overrun" ); n--; }
+        {  n--; }
       path[n] = '\0';  // terminate path string
       }
     c = p + 1;  // c = start of name in fullpath
@@ -335,7 +280,7 @@ void PathSplit( I1 *fullpath, I1 *drv, IX szd, I1 *path, IX szp,
       while( *c && n<sze )
         name[n++] = *c++;
     if( n == szn )
-      { errorc( 2, "pathsplit: file name overrun" ); n--; }
+      {  n--; }
     name[n] = '\0';  // terminate name string
     }
 
@@ -347,7 +292,7 @@ void PathSplit( I1 *fullpath, I1 *drv, IX szd, I1 *path, IX szp,
       for( c=p; *c && n<sze; c++ )
         ext[n++] = *c;
       if( n == sze )
-        { errorc( 2, "pathsplit: file extension overrun" ); n--; }
+        {  n--; }
       }
     ext[n] = '\0';  // terminate extension string
     }
@@ -379,10 +324,10 @@ void PathSplit( I1 *fullpath, I1 *drv, IX szd, I1 *path, IX szp,
 void PathCWD( I1 *path, IX szp )
   {
 #if( DEBUG > 0 )
-  if( !path ) errorc( 3, "PathCWD: NULL path" );
+  if( !path ) error( 3, "PathCWD: NULL path" );
 #endif
 #if( ANSIC )
-  if( szp < 2 ) errorc( 3, "PathCWD: szp < 2" );
+  if( szp < 2 ) error( 3, "PathCWD: szp < 2" );
   path[0] = '.';
   path[1] = '\0';
 #elif( _MSC_VER )
@@ -392,7 +337,7 @@ void PathCWD( I1 *path, IX szp )
   if( !getcwd( path, szp ) )
     path[0] = '\0';
 #else
-  errorc( 3, "PathCWD: Compiler not defined" );
+  error( 3, "PathCWD: Compiler not defined" );
 #endif
 
   }  /* end PathCWD */
@@ -529,7 +474,7 @@ I1 *GetStr( I1 *prompt, I1 *str )
     fputs( ": ", stderr );
     }
   if( !gets( str ) )
-    error( 3, __FILE__, __LINE__, "Failed to process input", "" );
+    error( 3, __FILE__, __LINE__, "Failed to process input");
 
   return str;
 
@@ -612,10 +557,10 @@ void NxtOpen( I1 *file_name, I1 *file, IX line )
  * line;  line number: __LINE__ */
   {
   if( _unxt )
-    error( 3, file, line, "_UNXT already open", "" );
+    error( 3, file, line, "_UNXT already open");
   _unxt = fopen( file_name, "r" );  /* = NULL if no file */
   if( !_unxt )
-    error( 3, file, line, "Could not open file: ", file_name, "" );
+    error(3, file, line, "Could not open file: %s", file_name);
   }  /* end NxtOpen */
 
 /***  NxtClose.c  ************************************************************/
@@ -627,7 +572,7 @@ void NxtClose( void )
   if( _unxt )
     {
     if( fclose( _unxt ) )
-      error( 2, __FILE__, __LINE__, "Problem while closing _UNXT", "" );
+      error(2, __FILE__, __LINE__, "Problem while closing _UNXT");
     _unxt = NULL;
     }
 
@@ -653,7 +598,7 @@ I1 *NxtLine( I1 *str, IX maxlen )
     if( i == maxlen )
       {
       str[i-1] = '\0';
-      error( 3, __FILE__, __LINE__, "Buffer overflow: ", str, "" );
+      error(3, __FILE__, __LINE__, "Buffer overflow: %s", str);
       }
     }
   if( i )
@@ -692,9 +637,9 @@ I1 *NxtWord( I1 *str, IX flag, IX maxlen )
 
 #ifdef _DEBUG
   if( !_unxt )
-    error( 3, __FILE__, __LINE__, "_UNXT not open", "" );
+    error( 3, __FILE__, __LINE__, "_UNXT not open" );
   if( maxlen < 16 )
-    error( 3, __FILE__, __LINE__, "Invalid maxlen: ", IntStr(maxlen), "" );
+    error( 3, __FILE__, __LINE__, "Invalid maxlen: %d", maxlen );
 #endif
   c = getc( _unxt );
   if( flag > 0 )
@@ -719,8 +664,7 @@ I1 *NxtWord( I1 *str, IX flag, IX maxlen )
             NxtLine( str, maxlen );
 #ifdef _DEBUG
         if( flag > 4 )
-          error( 3, __FILE__, __LINE__,
-            "Invalid flag: ", IntStr(flag), "" );
+          error( 3, __FILE__, __LINE__, "Invalid flag: %d", flag );
 #endif
         }
       ungetc( '\n', _unxt );  // restore EOL character for next call
@@ -731,8 +675,7 @@ I1 *NxtWord( I1 *str, IX flag, IX maxlen )
     {
 #ifdef _DEBUG
     if( flag < 0 )
-      error( 3, __FILE__, __LINE__,
-        "Invalid flag: ", IntStr(flag), "" );
+      error( 3, __FILE__, __LINE__, "Invalid flag: %d", flag);
 #endif
     if( c == ' ' || c == ',' || c == '\n' || c == '\t' )
       ; // skip EOW char saved at last call
@@ -790,7 +733,7 @@ I1 *NxtWord( I1 *str, IX flag, IX maxlen )
         if( i == maxlen )  // with overflow test
           {
           str[i-1] = '\0';
-          error( 3, __FILE__, __LINE__, "Buffer overflow: ", str, "" );
+          error(3, __FILE__, __LINE__, "Buffer overflow: %s", str);
           }
         break;
       }
@@ -811,7 +754,7 @@ R8 ReadR8( IX flag )
 
   NxtWord( _string, flag, sizeof(_string) );
   if( DblCon( _string, &value ) )
-    error( 2, __FILE__, __LINE__, _string, " is not a (valid) number", "" );
+    error(2, __FILE__, __LINE__, "%s is not a (valid) number", _string);
   return value;
 
   }  /* end ReadR8 */
@@ -826,7 +769,7 @@ R4 ReadR4( IX flag )
 
   NxtWord( _string, flag, sizeof(_string) );
   if( DblCon( _string, &value ) || value > FLT_MAX || value < -FLT_MAX )
-    error( 2, __FILE__, __LINE__, "Bad float value: ", _string, "" );
+    error(2, __FILE__, __LINE__, "Bad float value: %s", _string);
 
   return (R4)value;
 
@@ -841,9 +784,9 @@ IX ReadIX( IX flag )
   I4 value;
 
   NxtWord( _string, flag, sizeof(_string) );
-  if( LongCon( _string, &value ) ||
-      value > INT_MAX || value < INT_MIN )  // max/min depends on compiler
-    error( 2, __FILE__, __LINE__, "Bad integer: ", _string, "" );
+  if( LongCon( _string, &value ) 
+     || value > INT_MAX || value < INT_MIN )  // max/min depends on compiler
+    error(2, __FILE__, __LINE__, "Bad integer: %s", _string);
 
   return (IX)value;
 

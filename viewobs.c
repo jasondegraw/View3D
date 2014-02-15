@@ -1,5 +1,32 @@
-/*subfile:  viewobs.c  *******************************************************/
-
+/*subfile:  viewobs.c  ********************************************************/
+/*                                                                            */
+/*  This file is part of View3D.                                              */
+/*                                                                            */
+/*  View3D is distributed in the hope that it will be useful, but             */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of                */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                      */
+/*                                                                            */
+/*  This file has not been substantially changed from the original            */
+/*  public domain version made available with the disclaimer below,           */
+/*  and is thus in the public domain.                                         */
+/*                                                                            */
+/*  Original NIST Disclaimer:                                                 */
+/*                                                                            */
+/*  This software was developed at the National Institute of Standards        */
+/*  and Technology by employees of the Federal Government in the              */
+/*  course of their official duties. Pursuant to title 17 Section 105         */
+/*  of the United States Code this software is not subject to                 */
+/*  copyright protection and is in the public domain. These programs          */
+/*  are experimental systems. NIST assumes no responsibility                  */
+/*  whatsoever for their use by other parties, and makes no                   */
+/*  guarantees, expressed or implied, about its quality, reliability,         */
+/*  or any other characteristic.  We would appreciate acknowledgment          */
+/*  if the software is used. This software can be redistributed and/or        */
+/*  modified freely provided that any derivative works bear some              */
+/*  notice that they are derived from it, and any modified versions           */
+/*  bear some notice that they have been modified.                            */
+/*                                                                            */
+/******************************************************************************/
 /*  Compute obstructed view factors  */
 
 #ifdef _DEBUG
@@ -133,10 +160,13 @@ R8 ViewObstructed( VFCTRL *vfCtrl, IX nv1, VERTEX3D v1[], R8 area, IX nDiv )
 #endif
         nvs = ClipPolygon( -1, nvs, (VERTEX3D *)&srfT->v, zc, v2 );
 #if( DEBUG > 0 )
-        if( nvs >= MAXNV2 || nvs < 0 ) errorf( 3, __FILE__, __LINE__,
-          "Invalid number of vertices: ", IntStr(nvs), "" );
+        if(nvs >= MAXNV2 || nvs < 0)
+          error(3, __FILE__, __LINE__, 
+                "Invalid number of vertices (%d) in ViewObstructed",
+                nvs);
 #endif
-        if( nvs < 3 ) continue;                /* no shadow polygon created */
+        if(nvs < 3)
+          continue; /* no shadow polygon created */
         pv2 = v2;
 #if( DEBUG > 1 )
         DumpP3D( "Clipped surface:", nvs, pv2 );
@@ -154,22 +184,28 @@ R8 ViewObstructed( VFCTRL *vfCtrl, IX nv1, VERTEX3D v1[], R8 area, IX nDiv )
         }
               /* limit projected surface; avoid some HC problems */
 #if( DEBUG > 0 )
-        if( nvs >= MAXNV2 || nvs < 0 ) errorf( 3, __FILE__, __LINE__,
-          "Invalid number of vertices: ", IntStr(nvs), "" );
+        if( nvs >= MAXNV2 || nvs < 0 )
+            error(3, __FILE__, __LINE__,
+                  "Invalid number of vertices (%d) in ViewObstructed",
+                   nvs);
 #endif
       nvs = LimitPolygon( nvs, vs, xmax, xmin, ymax, ymin );
-      if( nvs < 3 ) continue;                  /* no shadow polygon created */
+      if(nvs < 3)
+        continue; /* no shadow polygon created */
 #if( DEBUG > 0 )
              /* bounds check on projected surface */
       {
       R8 temp = 0.0;
       for( n=0; n<nvs; n++ )
         {
-        if( fabs(vs[n].x) > temp ) temp = fabs(vs[n].x);
-        if( fabs(vs[n].y) > temp ) temp = fabs(vs[n].y);
+        if(fabs(vs[n].x) > temp)
+          temp = fabs(vs[n].x);
+        if(fabs(vs[n].y) > temp)
+          temp = fabs(vs[n].y);
         }
-      if( temp > 1.01 ) errorf( 1, __FILE__, __LINE__,
-        "Projected surface too large", "" );
+      if(temp > 1.01)
+        error(1, __FILE__, __LINE__,
+              "Projected surface too large in ViewObstructed");
       }
 #endif
       NewPolygonStack( );
@@ -222,8 +258,8 @@ R8 ViewObstructed( VFCTRL *vfCtrl, IX nv1, VERTEX3D v1[], R8 area, IX nDiv )
         {
         if( dF < -1.0e-16 )
           {
-          errorf( 1, __FILE__, __LINE__,
-            "Negative F (", FltStr(dF,4), ") set to 0", "" );
+          error(1, __FILE__, __LINE__, 
+                "Negative F (%4g) set to 0 in ViewObstructed", dF,4);
 # if( DEBUG > 0 )     /* normally 1 */
           DumpHC( " Polygon", pp, pp );
           fprintf( _ulog, " View point: (%g, %g, %g)\n", vpt[np].x, vpt[np].y, vpt[np].z );
@@ -248,9 +284,10 @@ R8 ViewObstructed( VFCTRL *vfCtrl, IX nv1, VERTEX3D v1[], R8 area, IX nDiv )
 #if( DEBUG > 0 )
   if( AFu < 0.0 )  // due to negative weight; enly np=0
     {
-    if( weight[0] > 0 ) errorf( 1, __FILE__, __LINE__,
-//    if( AFu < -1.0e-11 ) errorf( 1, __FILE__, __LINE__,
-      "Negative AFu (", FltStr(AFu,4), ") set to 0", "" );
+    if( weight[0] > 0 )
+    //if( AFu < -1.0e-11 )
+      error(1, __FILE__, __LINE__,
+           "Negative AFu (%4g) set to 0 in ViewObstructed", AFu);
     AFu = 0.0;
     }
 #endif
@@ -309,7 +346,7 @@ R8 V1AIpart( const IX nv, const VERTEX3D p2[],
         sum += UdotC * gamma / Clen;
         }
       else
-        error( 3, __FILE__, __LINE__, "View1AI failed, call George", "" );
+        error(3, __FILE__, __LINE__, "View1AI failed, call George");
       }
     }  /* end edge loop */
 

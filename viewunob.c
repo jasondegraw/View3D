@@ -1,5 +1,32 @@
-/*subfile:  viewunob.c  ******************************************************/
-
+/*subfile:  viewunob.c  *******************************************************/
+/*                                                                            */
+/*  This file is part of View3D.                                              */
+/*                                                                            */
+/*  View3D is distributed in the hope that it will be useful, but             */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of                */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                      */
+/*                                                                            */
+/*  This file has not been substantially changed from the original            */
+/*  public domain version made available with the disclaimer below,           */
+/*  and is thus in the public domain.                                         */
+/*                                                                            */
+/*  Original NIST Disclaimer:                                                 */
+/*                                                                            */
+/*  This software was developed at the National Institute of Standards        */
+/*  and Technology by employees of the Federal Government in the              */
+/*  course of their official duties. Pursuant to title 17 Section 105         */
+/*  of the United States Code this software is not subject to                 */
+/*  copyright protection and is in the public domain. These programs          */
+/*  are experimental systems. NIST assumes no responsibility                  */
+/*  whatsoever for their use by other parties, and makes no                   */
+/*  guarantees, expressed or implied, about its quality, reliability,         */
+/*  or any other characteristic.  We would appreciate acknowledgment          */
+/*  if the software is used. This software can be redistributed and/or        */
+/*  modified freely provided that any derivative works bear some              */
+/*  notice that they are derived from it, and any modified versions           */
+/*  bear some notice that they have been modified.                            */
+/*                                                                            */
+/******************************************************************************/
 /*  Compute unobstructed view factors  */
 
 #ifdef _DEBUG
@@ -228,7 +255,7 @@ R8 View2LI(const IX nd1, const IX nv1, const EDGEDCS *rc1, EDGEDIV **dv1,
           r2 = VDOT( (&R), (&R) );
 #if( DEBUG > 0 )
           if( r2 < EPS )
-            errorf( 2, __FILE__, __LINE__, "log(r2) ", FltStr(r2,6), "" );
+            error( 2, __FILE__, __LINE__, "log(r2)=%6g in View2LI", r2);
 #endif
           sumt += dv1[i][n].s * dv2[j][m].s * log( r2 );
           }  /* end m & n loops */
@@ -277,7 +304,7 @@ R8 View1LI(const IX nd1, const IX nv1, const EDGEDCS *rc1, EDGEDIV **dv1,
     b2 = VDOT( (&B), (&B) );
 #if( DEBUG > 0 )
     if( b2 < EPS2 )
-      errorf( 2, __FILE__, __LINE__, "small b2 ", FltStr(b2,6), "" );
+      error(2, __FILE__, __LINE__, "small b2=%6g in View1LI", b2);
 #endif
     b = sqrt( b2 );
     binv = 1.0 / b;    /* b > 0.0 */
@@ -357,7 +384,7 @@ R8 V1LIpart( const VERTEX3D *pp, const VERTEX3D *b0, const VERTEX3D *b1,
       sum += 2.0 * ( g * omega - b2 );
       }
     else
-      errorf( 3, __FILE__, __LINE__, "View1LI failed, call George", "" );
+      error(3, __FILE__, __LINE__, "View1LI failed, call George");
     *flag = 0;
     }
   else
@@ -492,7 +519,7 @@ R8 ViewALI( const IX nv1, const VERTEX3D *v1,
 
 #if( DEBUG > 0 )
   if( nv1>MAXNV1 )
-    errorf( 2, __FILE__, __LINE__, "MAXNV1 too small ", "" );
+    error(2, __FILE__, __LINE__, "MAXNV1 too small in ViewALI");
 #endif
 #if( DEBUG > 1 )
   fprintf( _ulog, "Begin ViewALI():\n" );
@@ -504,7 +531,7 @@ R8 ViewALI( const IX nv1, const VERTEX3D *v1,
     a[i] = VLEN( (&A[i]) );
 #if( DEBUG > 0 )
     if( a[i] < EPS )
-      errorf( 2, __FILE__, __LINE__, "small edge (a) ", FltStr(a[i],6), "" );
+      error(2, __FILE__, __LINE__, "small edge (a=%6g) in ViewALI",a[i]);
 #endif
     }
 
@@ -520,7 +547,7 @@ R8 ViewALI( const IX nv1, const VERTEX3D *v1,
     b = sqrt( b2 );
 #if( DEBUG > 0 )
     if( b < EPS )
-      errorf( 2, __FILE__, __LINE__, "small edge (b) ", FltStr(b,6), "" );
+      error(2, __FILE__, __LINE__, "small edge (b=%6g) in ViewALI", b);
 #endif
 
     im1 = nv1 - 1;
@@ -646,7 +673,7 @@ IX DivideEdges( IX nDiv, IX nVrt, VERTEX3D *Vrt, EDGEDCS *rc, EDGEDIV **dv )
 #if( DEBUG > 0 )
   if( nDiv > 4 )
     {
-    errorf( 2, __FILE__, __LINE__, "nDiv > 4", "" );
+    error(2, __FILE__, __LINE__, "nDiv > 4 in DivideEdges");
     nDiv = 4;
     }
 #endif
@@ -777,7 +804,7 @@ IX SubSrf( const IX nDiv, const IX nv, const VERTEX3D *Sv, const R8 area,
   for( n=0; n<nSubSrf; n++ )
     fprintf( _ulog, "%3d, %9.6f %9.6f %9.6f %9.6f\n",
       n, Gpt[n].x, Gpt[n].y, Gpt[n].z, wt[n] );
-  error( 3, __FILE__, __LINE__, "end test", "" );
+  error( 3, __FILE__, __LINE__, "end test");
 #endif
 
   return nSubSrf;
