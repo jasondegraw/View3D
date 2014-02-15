@@ -221,119 +221,122 @@ typedef struct poly   /* description of a polygon */
 
 /*  function prototypes.  */
 
-     /* input / output */
+/* input / output */
 void CountVS3D( I1 *title, VFCTRL *vfCtrl );
-void GetVS3D( I1 **name, R4 *emit, IX *base, IX *cmbn,
-  SRFDAT3D *srf, VERTEX3D *xyz, VFCTRL *vfCtrl );
-void GetVS3Da( I1 **name, R4 *emit, IX *base, IX *cmbn,
-  SRFDAT3D *srf, VERTEX3D *xyz, VFCTRL *vfCtrl );
-R8 VolPrism( VERTEX3D *a, VERTEX3D *b, VERTEX3D *c );
-void SetPlane( SRFDAT3D *srf );
-void ReportAF( const IX nSrf, const IX encl, const I1 *title, const I1 **name, 
-  const R4 *area, const R4 *emit, const IX *base, const R8 **AF, IX flag );
+void GetVS3D(I1 **name, R4 *emit, IX *base, IX *cmbn,SRFDAT3D *srf,
+             VERTEX3D *xyz, VFCTRL *vfCtrl);
+void GetVS3Da(I1 **name, R4 *emit, IX *base, IX *cmbn,SRFDAT3D *srf,
+              VERTEX3D *xyz, VFCTRL *vfCtrl );
+R8 VolPrism(VERTEX3D *a, VERTEX3D *b, VERTEX3D *c);
+void SetPlane(SRFDAT3D *srf);
+void ReportAF(const IX nSrf, const IX encl, const I1 *title, I1 ** name, 
+              const R4 *area, const R4 *emit, const IX *base, R8 ** AF, 
+              IX flag);
 
      /* 3-D view factor functions */
-void View3D( SRFDAT3D *srf, const IX *base, IX *possibleObstr,
-  R8 **AF, VFCTRL *vfCtrl );
-IX ProjectionDirection( SRFDAT3D *srf, SRFDATNM *srfn, SRFDATNM *srfm,
-  IX *los, VFCTRL *vfCtrl );
+void View3D(SRFDAT3D *srf, const IX *base, IX *possibleObstr,R8 **AF,
+            VFCTRL *vfCtrl );
+IX ProjectionDirection(SRFDAT3D *srf, SRFDATNM *srfn, SRFDATNM *srfm,
+                       IX *los, VFCTRL *vfCtrl);
 IX errorf( IX severity, I1 *file, IX line, ... );
 
 R8 ViewUnobstructed( VFCTRL *vfCtrl, IX row, IX col );
-R8 View2AI( const IX nss1, const DIRCOS *dc1, const VERTEX3D *pt1, const R8 *area1,
-            const IX nss2, const DIRCOS *dc2, const VERTEX3D *pt2, const R8 *area2 );
-R8 View2LI( const IX nd1, const IX nv1, const EDGEDCS *rc1, const EDGEDIV **dv1,
-  const IX nd2, const IX nv2, const EDGEDCS *rc2, const EDGEDIV **dv2 );
-R8 View1LI( const IX nd1, const IX nv1, const EDGEDCS *rc1,
-  const EDGEDIV **dv1, const VERTEX3D *v1, const IX nv2, const VERTEX3D *v2 );
-R8 V1LIpart( const VERTEX3D *pp, const VERTEX3D *b0, const VERTEX3D *b1,
+R8 View2AI(const IX nss1, const DIRCOS *dc1, const VERTEX3D *pt1, 
+           const R8 *area1, const IX nss2, const DIRCOS *dc2, 
+           const VERTEX3D *pt2, const R8 *area2 );
+R8 View2LI(const IX nd1, const IX nv1, const EDGEDCS *rc1, EDGEDIV **dv1,
+           const IX nd2, const IX nv2, const EDGEDCS *rc2, EDGEDIV **dv2 );
+R8 View1LI(const IX nd1, const IX nv1, const EDGEDCS *rc1, EDGEDIV **dv1,
+           const VERTEX3D *v1, const IX nv2, const VERTEX3D *v2);
+R8 V1LIpart(const VERTEX3D *pp, const VERTEX3D *b0, const VERTEX3D *b1,
   const VECTOR3D *B, const R8 b2, IX *flag );
-R8 V1LIxact( const VERTEX3D *a0, const VERTEX3D *a1, const R8 a, 
-  const VERTEX3D *b0, const VERTEX3D *b1, const R8 b );
-R8 V1LIadapt( VERTEX3D Pold[3], R8 dFold[3], R8 h, const VERTEX3D *b0,
-  const VERTEX3D *b1, const VECTOR3D *B, const R8 b2, IX level, VFCTRL *vfCtrl );
-R8 ViewALI( const IX nv1, const VERTEX3D *v1,
-  const IX nv2, const VERTEX3D *v2, VFCTRL *vfCtrl );
-void ViewsInit( IX maxDiv, IX init );
-IX DivideEdges( IX nd, IX nv, VERTEX3D *vs, EDGEDCS *rc, EDGEDIV **dv );
-IX GQParallelogram( const IX nDiv, const VERTEX3D *vp, VERTEX3D *p, R8 *w );
-IX GQTriangle( const IX nDiv, const VERTEX3D *vt, VERTEX3D *p, R8 *w );
-IX SubSrf( const IX nDiv, const IX nv, const VERTEX3D *v, const R8 area,
-  VERTEX3D *pt, R8 *wt );
+R8 V1LIxact(const VERTEX3D *a0, const VERTEX3D *a1, const R8 a, 
+            const VERTEX3D *b0, const VERTEX3D *b1, const R8 b);
+R8 V1LIadapt(VERTEX3D Pold[3], R8 dFold[3], R8 h, const VERTEX3D *b0,
+             const VERTEX3D *b1, const VECTOR3D *B, const R8 b2, IX level, 
+             VFCTRL *vfCtrl );
+R8 ViewALI(const IX nv1, const VERTEX3D *v1, const IX nv2, const VERTEX3D *v2,
+           VFCTRL *vfCtrl );
+void ViewsInit(IX maxDiv, IX init);
+IX DivideEdges(IX nd, IX nv, VERTEX3D *vs, EDGEDCS *rc, EDGEDIV **dv);
+IX GQParallelogram(const IX nDiv, const VERTEX3D *vp, VERTEX3D *p, R8 *w);
+IX GQTriangle( const IX nDiv, const VERTEX3D *vt, VERTEX3D *p, R8 *w);
+IX SubSrf(const IX nDiv, const IX nv, const VERTEX3D *v, const R8 area,
+          VERTEX3D *pt, R8 *wt);
 
-R8 ViewObstructed( VFCTRL *vfCtrl, IX nv1, VERTEX3D v1[], R8 area, IX nDiv );
-R8 View1AI( IX nss, VERTEX3D *p1, R8 *area1, DIRCOS *dc1, SRFDAT3X *srf2 );
-R8 V1AIpart( const IX nv, const VERTEX3D p2[],
-            const VERTEX3D *p1, const DIRCOS *u1 );
-IX Subsurface( SRFDAT3X *srf, SRFDAT3X sub[] );
-R8 SetCentroid( const IX nv, VERTEX3D *vs, VERTEX3D *ctd );
-R8 Triangle( VERTEX3D *p1, VERTEX3D *p2, VERTEX3D *p3, void *dc, IX dcflag );
-void substs( IX n, VERTEX3D v[], VERTEX3D s[] );
-R8 ViewTP( VERTEX3D v1[], R8 area, IX level, VFCTRL *vfCtrl );
-R8 ViewRP( VERTEX3D v1[], R8 area, IX level, VFCTRL *vfCtrl );
+R8 ViewObstructed(VFCTRL *vfCtrl, IX nv1, VERTEX3D v1[], R8 area, IX nDiv);
+R8 View1AI(IX nss, VERTEX3D *p1, R8 *area1, DIRCOS *dc1, SRFDAT3X *srf2);
+R8 V1AIpart(const IX nv, const VERTEX3D p2[],const VERTEX3D *p1,
+            const DIRCOS *u1);
+IX Subsurface(SRFDAT3X *srf, SRFDAT3X sub[]);
+R8 SetCentroid(const IX nv, VERTEX3D *vs, VERTEX3D *ctd);
+R8 Triangle(VERTEX3D *p1, VERTEX3D *p2, VERTEX3D *p3, void *dc, IX dcflag);
+void substs(IX n, VERTEX3D v[], VERTEX3D s[]);
+R8 ViewTP(VERTEX3D v1[], R8 area, IX level, VFCTRL *vfCtrl);
+R8 ViewRP(VERTEX3D v1[], R8 area, IX level, VFCTRL *vfCtrl);
 
-     /* 3-D view test functions */
-IX AddMaskSrf( SRFDAT3D *srf, const SRFDATNM *srfN, const SRFDATNM *srfM,
-  const IX *maskSrf, const IX *baseSrf, VFCTRL *vfCtrl, IX *los, IX nPoss );
-IX BoxTest( SRFDAT3D *srf, SRFDATNM *srfn, SRFDATNM *srfm, VFCTRL *vfCtrl,
+/* 3-D view test functions */
+IX AddMaskSrf(SRFDAT3D *srf, const SRFDATNM *srfN, const SRFDATNM *srfM,
+              const IX *maskSrf, const IX *baseSrf, VFCTRL *vfCtrl, IX *los,
+              IX nPoss);
+IX BoxTest(SRFDAT3D *srf, SRFDATNM *srfn, SRFDATNM *srfm, VFCTRL *vfCtrl,
   IX *los, IX nProb );
-IX ClipPolygon( const IX flag, const IX nv, VERTEX3D *v,
-  R8 *dot, VERTEX3D *vc );
-IX ConeRadiusTest( SRFDAT3D *srf, SRFDATNM *srfn, SRFDATNM *srfm,
-  VFCTRL *vfCtrl, IX *los, IX nProb, R8 distNM );
-IX CylinderRadiusTest( SRFDAT3D *srf, SRFDATNM *srfN, SRFDATNM *srfM,
-  IX *los, R8 distNM, IX nProb );
+IX ClipPolygon(const IX flag, const IX nv, VERTEX3D *v, R8 *dot, VERTEX3D *vc);
+IX ConeRadiusTest(SRFDAT3D *srf, SRFDATNM *srfn, SRFDATNM *srfm,
+                  VFCTRL *vfCtrl, IX *los, IX nProb, R8 distNM);
+IX CylinderRadiusTest(SRFDAT3D *srf, SRFDATNM *srfN, SRFDATNM *srfM,
+                      IX *los, R8 distNM, IX nProb);
 IX OrientationTest( SRFDAT3D *srf, SRFDATNM *srfn, SRFDATNM *srfm, 
   VFCTRL *vfCtrl, IX *los, IX nProb );
-IX OrientationTestN( SRFDAT3D *srf, IX N, VFCTRL *vfCtrl,
-  IX *possibleObstr, IX nPossObstr );
-void SelfObstructionClip( SRFDATNM *srfn );
-IX SetShape( const IX nv, VERTEX3D *v, R8 *area );
-IX SelfObstructionTest3D( SRFDAT3D *srf1, SRFDAT3D *srf2, SRFDATNM *srfn );
-void IntersectionTest( SRFDATNM *srfn, SRFDATNM *srfm );
-void DumpOS( I1 *title, const IX nos, IX *los );
-IX SetPosObstr3D( IX nSrf, SRFDAT3D *srf, IX *lpos );
+IX OrientationTestN(SRFDAT3D *srf, IX N, VFCTRL *vfCtrl,
+                    IX *possibleObstr, IX nPossObstr);
+void SelfObstructionClip(SRFDATNM *srfn );
+IX SetShape(const IX nv, VERTEX3D *v, R8 *area);
+IX SelfObstructionTest3D(SRFDAT3D *srf1, SRFDAT3D *srf2, SRFDATNM *srfn);
+void IntersectionTest(SRFDATNM *srfn, SRFDATNM *srfm);
+void DumpOS(I1 *title, const IX nos, IX *los);
+IX SetPosObstr3D(IX nSrf, SRFDAT3D *srf, IX *lpos);
 
-     /* polygon processing */
-IX PolygonOverlap( const POLY *p1, POLY *p2, const IX flagOP, IX freeP2 );
-void FreePolygons( POLY *first, POLY *last );
-POLY *SetPolygonHC( const IX nVrt, const VERTEX2D *polyVrt, const R8 trns );
-IX GetPolygonVrt2D( const POLY *pp, VERTEX2D *polyVrt );
-IX GetPolygonVrt3D( const POLY *pp, VERTEX3D *srfVrt );
-POLY *GetPolygonHC( void );
-HCVE *GetVrtEdgeHC( void );
-void NewPolygonStack( void );
-POLY *TopOfPolygonStack( void );
-void InitTmpVertMem( void );
-void FreeTmpVertMem( void );
-void InitPolygonMem( const R8 epsDist, const R8 epsArea );
-void FreePolygonMem( void );
-IX LimitPolygon( IX nVrt, VERTEX2D polyVrt[],
-  const R8 maxX, const R8 minX, const R8 maxY, const R8 minY );
-void DumpHC( I1 *title, const POLY *pfp, const POLY *plp );
-void DumpFreePolygons( void );
-void DumpFreeVertices( void );
-void DumpP2D( I1 *title, const IX nvs, VERTEX2D *vs );
-void DumpP3D( I1 *title, const IX nvs, VERTEX3D *vs );
+/* polygon processing */
+IX PolygonOverlap(const POLY *p1, POLY *p2, const IX flagOP, IX freeP2);
+void FreePolygons(POLY *first, POLY *last);
+POLY *SetPolygonHC(const IX nVrt, const VERTEX2D *polyVrt, const R8 trns);
+IX GetPolygonVrt2D(const POLY *pp, VERTEX2D *polyVrt);
+IX GetPolygonVrt3D(const POLY *pp, VERTEX3D *srfVrt);
+POLY *GetPolygonHC(void);
+HCVE *GetVrtEdgeHC(void);
+void NewPolygonStack(void);
+POLY *TopOfPolygonStack(void);
+void InitTmpVertMem(void);
+void FreeTmpVertMem(void);
+void InitPolygonMem(const R8 epsDist, const R8 epsArea);
+void FreePolygonMem(void);
+IX LimitPolygon(IX nVrt, VERTEX2D polyVrt[], const R8 maxX, const R8 minX, 
+                const R8 maxY, const R8 minY);
+void DumpHC(I1 *title, const POLY *pfp, const POLY *plp);
+void DumpFreePolygons(void);
+void DumpFreeVertices(void);
+void DumpP2D(I1 *title, const IX nvs, VERTEX2D *vs);
+void DumpP3D(I1 *title, const IX nvs, VERTEX3D *vs);
 
-     /* vector functions */
-void CoordTrans3D( SRFDAT3D *srfAll, SRFDATNM *srf1, SRFDATNM *srf2,
-  IX *probableObstr, VFCTRL *vfCtrl );
-void DumpSrf3D( I1 *title, SRFDAT3D *srf );
-void DumpSrfNM( I1 *title, SRFDATNM *srf );
-void Dump3X( I1 *tittle, SRFDAT3X *srfT );
-void DumpVA( I1 *title, const IX rows, const IX cols, R8 *a );
+/* vector functions */
+void CoordTrans3D(SRFDAT3D *srfAll, SRFDATNM *srf1, SRFDATNM *srf2,
+                  IX *probableObstr, VFCTRL *vfCtrl);
+void DumpSrf3D(I1 *title, SRFDAT3D *srf);
+void DumpSrfNM(I1 *title, SRFDATNM *srf);
+void Dump3X(I1 *tittle, SRFDAT3X *srfT);
+void DumpVA(I1 *title, const IX rows, const IX cols, R8 *a);
 
-     /* post processing */
-IX DelNull( const IX nSrf, SRFDAT3D *srf, IX *base, IX *cmbn,
-  R4 *emit, R4 *area, I1 **name, R8 **AF );
-void NormAF( const nSrf, const R4 *emit, const R4 *area, R8 **AF,
-  const R8 eMax, const IX itMax );
-IX Combine( const IX nSrf, const IX *cmbn, R4 *area, I1 **name, R8 **AF );
-void Separate( const IX nSrf, const IX *base, R4 *area, R8 **AF );
-void IntFac( const IX nSrf, const R4 *emit, const R4 *area, R8 **AF );
-void LUFactorSymm( const IX neq, R8 **a );
-void LUSolveSymm( const IX neq, const R8 **a, R8 *b );
-void DAXpY( const IX n, const R8 a, const R8 *x, R8 *y );
-R8 DotProd( const IX n, const R8 *x, const R8 *y );
+/* post processing */
+IX DelNull(const IX nSrf, SRFDAT3D *srf, IX *base, IX *cmbn, R4 *emit,
+           R4 *area, I1 **name, R8 **AF);
+void NormAF(const nSrf, const R4 *emit, const R4 *area, R8 **AF,
+            const R8 eMax, const IX itMax );
+IX Combine(const IX nSrf, const IX *cmbn, R4 *area, I1 **name, R8 **AF);
+void Separate(const IX nSrf, const IX *base, R4 *area, R8 **AF);
+void IntFac(const IX nSrf, const R4 *emit, const R4 *area, R8 **AF);
+void LUFactorSymm(const IX neq, R8 **a);
+void LUSolveSymm(const IX neq, R8 **a, R8 *b);
+void DAXpY(const IX n, const R8 a, const R8 *x, R8 *y);
+R8 DotProd(const IX n, const R8 *x, const R8 *y);
 

@@ -295,14 +295,14 @@ void View3D( SRFDAT3D *srf, const IX *base, IX *possibleObstr,
 
         else                      /*** unobstructed view factors ***/
           {
-          SRFDATNM *srf1;  /* pointer to surface 1 (smaller surface) */
-          SRFDATNM *srf2;  /* pointer to surface 2 */
+          //SRFDATNM *srf1;  /* pointer to surface 1 (smaller surface) */
+          //SRFDATNM *srf2;  /* pointer to surface 2 */
           vfCtrl->method = 5;
           vfCtrl->failViewALI = 0;
-          if( srfN.rc >= srfM.rc )
-            { srf1 = &srfM; srf2 = &srfN; }
-          else
-            { srf1 = &srfN; srf2 = &srfM; }
+          //if( srfN.rc >= srfM.rc )
+          //  { srf1 = &srfM; srf2 = &srfN; }
+          //else
+          //  { srf1 = &srfN; srf2 = &srfM; }
           ViewMethod( &srfN, &srfM, distNM, vfCtrl );
 //        minArea = MIN( srfN.area, srfM.area );
           vfCtrl->epsAF = minArea * vfCtrl->epsAdap;

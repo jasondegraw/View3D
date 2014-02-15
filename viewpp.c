@@ -322,8 +322,8 @@ R8 DotProd( const IX n, const R8 *x, const R8 *y )
 /*  Solution of simultaneous equations [A] * {X} = {B}, where [A] (which is
  *  stored by rows) has already been reduced to L-U form in LUFactorSymm(). 
  *  The solution vector {X} over-writes {B}.  */
-
-void LUSolveSymm( const IX neq, const R8 **a, R8 *b )
+/* const removal: const R8 **a */
+void LUSolveSymm( const IX neq, R8 **a, R8 *b )
   {
   IX i;
 

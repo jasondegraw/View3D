@@ -36,6 +36,9 @@ void ReadVF(I1 *fileName, I1 *program, I1 *version, IX *format, IX *encl,
             IX init, IX shape );
 void SaveVF(I1 *fileName, I1 *program, I1 *version, IX format, IX encl,
             IX didemit, IX nSrf, R4 *area, R4 *emit, R8 **AF, R4 *vtmp);
+//void ReportAF(const IX nSrf, const IX encl, const I1 *title, I1 ** const name,
+//              const R4 *area, const R4 *emit, const IX *base, const R8 **AF, 
+//              IX flag);
 void FindFile( I1 *msg, I1 *name, I1 *type );
 
 /***  usage  ******************************************************************/
@@ -67,9 +70,9 @@ IX main( IX argc, I1 **argv )
   {
   I1 inFile[_MAX_PATH]=""; /* input file name */
   I1 outFile[_MAX_PATH]="";/* output file name */
-  I1 fileName[_MAX_PATH];  /* name of file */
-  I1 vdrive[_MAX_DRIVE];   /* drive letter for program View3D.exe */
-  I1 vdir[_MAX_DIR];       /* directory path for program View3D.exe */
+  //I1 fileName[_MAX_PATH];  /* name of file */
+  //I1 vdrive[_MAX_DRIVE];   /* drive letter for program View3D.exe */
+  //I1 vdir[_MAX_DIR];       /* directory path for program View3D.exe */
   I1 title[LINELEN];  /* project title */
   I1 **name;       /* surface names [1:nSrf][0:NAMELEN] */
   I1 *types[]={"rsrf","subs","mask","nuls","obso"};
@@ -565,9 +568,10 @@ R8 VolPrism( VERTEX3D *a, VERTEX3D *b, VERTEX3D *c )
   }  /* end of VolPrism */
 
 /***  ReportAF.c  ************************************************************/
-
-void ReportAF( const IX nSrf, const IX encl, const I1 *title, const I1 **name,
-  const R4 *area, const R4 *emit, const IX *base, const R8 **AF, IX flag )
+/* consts removed: const I1 ** name and const R8 ** AF */
+void ReportAF(const IX nSrf, const IX encl, const I1 *title, I1 ** name,
+              const R4 *area, const R4 *emit, const IX *base, R8 ** AF, 
+              IX flag)
   {
   IX n;    /* row */
   IX m;    /* column */

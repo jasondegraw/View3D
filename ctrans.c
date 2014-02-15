@@ -164,8 +164,8 @@ void CTRotateU( const DIRCOS *u, R8 t[4][4] )
  *     | 1. |   | 0.0 0.0 0.0 1.0 |   | 1. | 
  *  (Constants in row 4 are assumed; i.e., no perspective transformation.)
  */
-
-void CT3D( const IX nv, const R8 t[4][4], const VECTOR3D *p, VECTOR3D *q )
+/* const removal: const R8 t[4][4] */
+void CT3D(const IX nv, R8 t[4][4], const VECTOR3D *p, VECTOR3D *q)
   {
   IX n;
 

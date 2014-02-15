@@ -193,9 +193,9 @@ R8 View2AI( const IX nss1, const DIRCOS *dc1, const VERTEX3D *pt1, const R8 *are
 /*  Compute direct interchange area by double line integration. 
  *  Both surfaces described by directions cosines of edges and 
  *  subdivisions of those edges for numerical integration.  */
-
-R8 View2LI( const IX nd1, const IX nv1, const EDGEDCS *rc1, const EDGEDIV **dv1,
-            const IX nd2, const IX nv2, const EDGEDCS *rc2, const EDGEDIV **dv2 )
+/* const removal: const EDGEDIV **dv1, const EDGEDIV **dv2 */
+R8 View2LI(const IX nd1, const IX nv1, const EDGEDCS *rc1, EDGEDIV **dv1,
+           const IX nd2, const IX nv2, const EDGEDCS *rc2, EDGEDIV **dv2)
 /* nd1 - number of edge divisions of polygon 1.
  * nv1 - number of vertices/edges of polygon 1.
  * rc1 - vector of direction cosines of edges of polygon 1.
@@ -248,9 +248,9 @@ R8 View2LI( const IX nd1, const IX nv1, const EDGEDCS *rc1, const EDGEDIV **dv1,
  *  Surface 1 described by directions cosines of edges and 
  *  subdivisions of those edges for numerical integration. 
  *  Surface 2 described by its vertices.  */
-
-R8 View1LI( const IX nd1, const IX nv1, const EDGEDCS *rc1,
-  const EDGEDIV **dv1, const VERTEX3D *v1, const IX nv2, const VERTEX3D *v2 )
+/* const removal: const EDGEDIV **dv1 */
+R8 View1LI(const IX nd1, const IX nv1, const EDGEDCS *rc1, EDGEDIV **dv1,
+           const VERTEX3D *v1, const IX nv2, const VERTEX3D *v2)
 /* nd1 - number of edge divisions of polygon 1.
  * nv1 - number of vertices/edges of polygon 1.
  * rc1 - vector of direction cosines of edges of polygon 1.
