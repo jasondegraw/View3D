@@ -515,10 +515,10 @@ IX Subsurface( SRFDAT3X *srf, SRFDAT3X sub[] )
         nSubSrf = 3;
         break;
       case 15:      /* invalid configuration */
-        error( 2, __FILE__, __LINE__, "Invalid configuration", "" );
+        error(2, __FILE__, __LINE__, "Invalid configuration in Subsurface");
         break;
       default:
-        error( 2, __FILE__, __LINE__, "Invalid switch: ", IntStr(obtuse), "" );
+        error(2, __FILE__, __LINE__, "Invalid switch %d in Subsurface",obtuse);
       } /* end switch */
     if( obtuse > 0 )    /* complete subdivision data */
       for( j=0; j<nSubSrf; j++ )
@@ -547,8 +547,8 @@ IX Subsurface( SRFDAT3X *srf, SRFDAT3X sub[] )
     nSubSrf = 5;
     }
   else
-    error( 3, __FILE__, __LINE__,
-      "Invalid number of vertices", IntStr(srf->nv), "" );
+    error(3, __FILE__, __LINE__,
+          "Invalid number of vertices (%d) in Subsurface",srf->nv);
 
   return nSubSrf;
 
@@ -610,17 +610,16 @@ R8 Triangle( VERTEX3D *p1, VERTEX3D *p2, VERTEX3D *p3, void *dc, IX dcflag )
   VECTOR( p2, p3, (&a) );
   VECTOR( p2, p1, (&b) );
   VCROSS( (&a), (&b), c );
-  r = VLEN( c );
-  if( dcflag )   /* compute direction cosines */
+  r = VLEN(c);
+  if(dcflag)   /* compute direction cosines */
     {
-    if( r <= 1.e-12 )
+    if(r <= 1.e-12)
       {
       fprintf( _ulog, "Vertices:\n" );
       fprintf( _ulog, "  %f  %f  %f\n", p1->x, p1->y, p1->z );
       fprintf( _ulog, "  %f  %f  %f\n", p2->x, p2->y, p2->z );
       fprintf( _ulog, "  %f  %f  %f\n", p3->x, p3->y, p3->z );
-      error( 3, __FILE__,  __LINE__,
-        "Vertices give invalid area, surface ", IntStr(dcflag), "" );
+      error(3, __FILE__, __LINE__, "Vertices give invalid area in Triangle");
       }
     c->x /= r;   /* reduce C to unit length */
     c->y /= r;

@@ -8,41 +8,16 @@
 #ifndef COM_FUNCS
 # define COM_FUNCS
 
-     /* functions in misc.c */
+/* functions in misc.c */
 IX error( IX severity, I1 *file, IX line, ... );
 I1 *sfname( I1* longfilename );
-void LogNote( I1 *file, IX line, ... );
-
-void PathMerge( I1 *fullpath, IX szfp, I1 *drv, I1 *path, I1 *name, I1 *ext );
-void PathSplit( I1 *fullpath, I1 *drv, IX szd, I1 *path, IX szp,
-                I1 *name, IX szn, I1 *ext, IX sze );
-void PathCWD( I1 *path, IX szp );
-
-void PgmInit( I1 *program );
-I1 *NextArg( const IX argc, I1 **argv );
 
 IX LongCon( I1 *str, I4 *i );
 IX IntCon( I1 *str, IX *i );
 I1 *IntStr( I4 i );
 
-IX HexCon( I1 *s, U4 *i );
-I1 *HexStr( U4 j );
-
 IX DblCon( I1 *str, R8 *f );
 IX FltCon( I1 *str, R4 *f );
-I1 *FltStr( R8 f, IX n );
-
-IX TimeCon( I1 *string, I4 *time );
-I1 *TimeStr( I4 time );
-IX DateCon( I1 *s, I4 *day_of_year );
-I1 *DateStr( IX day_of_year );
-IX DatXCon( I1 *s, I4 *day_of_year );
-I1 *DatXStr( IX day_of_year );
-
-IX GetKey( void );
-I1 *GetStr( I1 *prompt, I1 *str );
-IX NoYes( I1 *question );
-void Pause( void );
 
 void NxtOpen( I1 *file_name, I1 *file, IX line );
 void NxtClose( void );
@@ -70,7 +45,7 @@ R4 CPUtime( R4 t1 );
 void Delay( R4 seconds );
 IX max0( IX n1, IX n2 );
 IX min0( IX n1, IX n2 );
-void PtrXchg( void **p1, void **p2 );
+
 I1 *strctr( I1 *s, IX n );
 I1 *strcpys( I1 *s, const IX mx, ...  );
 IX streql( I1 *s1, I1 *s2 );

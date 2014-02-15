@@ -1,5 +1,23 @@
-/*subfile:  v3main.c  ********************************************************/
-
+/*subfile:  v3main.c  *********************************************************/
+/*                                                                            */
+/*  Copyright (c) 2014 Jason W. DeGraw                                        */
+/*                                                                            */
+/*  This file is part of View3D.                                              */
+/*                                                                            */
+/*  View3D is free software: you can redistribute it and/or modify it         */
+/*  under the terms of the GNU General Public License as published by         */
+/*  the Free Software Foundation, either version 3 of the License, or         */
+/*  (at your option) any later version.                                       */
+/*                                                                            */
+/*  View3D is distributed in the hope that it will be useful, but             */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of                */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU         */
+/*  General Public License for more details.                                  */
+/*                                                                            */
+/*  You should have received a copy of the GNU General Public License         */
+/*  along with View3D.  If not, see <http://www.gnu.org/licenses/>.           */
+/*                                                                            */
+/******************************************************************************/
 /*  Main program for batch processing of 3-D view factors.  */
 
 #ifdef _DEBUG
@@ -39,7 +57,6 @@ void SaveVF(I1 *fileName, I1 *program, I1 *version, IX format, IX encl,
 //void ReportAF(const IX nSrf, const IX encl, const I1 *title, I1 ** const name,
 //              const R4 *area, const R4 *emit, const IX *base, const R8 **AF, 
 //              IX flag);
-void FindFile( I1 *msg, I1 *name, I1 *type );
 
 /***  usage  ******************************************************************/
 /*  Describe usage of the program  */
@@ -70,9 +87,6 @@ IX main( IX argc, I1 **argv )
   {
   I1 inFile[_MAX_PATH]=""; /* input file name */
   I1 outFile[_MAX_PATH]="";/* output file name */
-  //I1 fileName[_MAX_PATH];  /* name of file */
-  //I1 vdrive[_MAX_DRIVE];   /* drive letter for program View3D.exe */
-  //I1 vdir[_MAX_DIR];       /* directory path for program View3D.exe */
   I1 title[LINELEN];  /* project title */
   I1 **name;       /* surface names [1:nSrf][0:NAMELEN] */
   I1 *types[]={"rsrf","subs","mask","nuls","obso"};
@@ -100,17 +114,6 @@ IX main( IX argc, I1 **argv )
       usage(stderr);
       return EXIT_FAILURE;
     }
-/*
-  if( argc == 1 || argv[1][0] == '?' )
-    {
-    fputs("\n\
-    VIEW3D - compute view factors for a 3D geometry.\n\n\
-       VIEW3D  input_file  output_file\n\n\
-    You may also enter the file names interactively.\n\n", stderr );
-    if( argc > 1 )
-      exit( 1 );
-    }
-*/
   /* open log file */
   //_ulog = fopen( "View3D.log", "w" );
   _ulog = stdout;
@@ -145,17 +148,6 @@ IX main( IX argc, I1 **argv )
           __GNUC_PATCHLEVEL__);
 #endif
 #endif
-/*
-#ifdef ANSI
-  _ulog = fopen( "View3D.log", "w" );
-#else
-  PathSplit( argv[0], vdrive, sizeof(vdrive), vdir, sizeof(vdir), NULL, 0, NULL, 0 );
-  PathMerge( fileName, sizeof(fileName), vdrive, vdir, "View3D", ".log" );
-  _ulog = fopen( fileName, "w" );
-#endif
-  if( !_ulog )
-    error( 3, __FILE__, __LINE__, "Failed to open VIEW3D.LOG", "" );
-*/
 
 #if( DEBUG > 0 )
   _echo = 1;
@@ -182,17 +174,19 @@ IX main( IX argc, I1 **argv )
   software is used. This software can be redistributed and/or\n\
   modified freely provided that any derivative works bear some\n\
   notice that they are derived from it, and any modified\n\
-  versions bear some notice that they have been modified.\n", stderr );
-  time0 = CPUtime( 0.0 );  /* start-of-run time */
+  versions bear some notice that they have been modified.\n\n",_ulog);
 
-                 /* initialize control data */
+  /* Record the start-of-run time */
+  time0 = CPUtime( 0.0 );  
+
+  /* Initialize control data */
   memset( &vfCtrl, 0, sizeof(VFCTRL) );
-  // non-zero control values:
+  /* Non-zero control values */
   vfCtrl.epsAdap = 1.0e-4f; // convergence for adaptive integration
   vfCtrl.maxRecursALI = 12; // maximum number of recursion levels
   vfCtrl.maxRecursion = 8;  // maximum number of recursion levels
 
-                 /* read Vertex/Surface data file */
+  /* Read Vertex/Surface data file */
   //NxtOpen( inFile, __FILE__, __LINE__ );
   CountVS3D( title, &vfCtrl );
   fprintf( _ulog, "\nTitle: %s\n", title );
@@ -275,9 +269,10 @@ IX main( IX argc, I1 **argv )
 
   if( nSrf0 >= 1000 )
     {
-    sprintf( _string, "\n %.2f seconds to process input data\n", CPUtime(time0) );
-    fputs( _string, stderr );
-    fputs( _string, _ulog );
+      fprintf(stderr, "\n %.3e seconds to process input data\n",
+              CPUtime(time0));
+      fprintf(_ulog, "\n %.3e seconds to process input data\n",
+              CPUtime(time0));
     }
 
   if( _list>2 )
@@ -568,7 +563,7 @@ R8 VolPrism( VERTEX3D *a, VERTEX3D *b, VERTEX3D *c )
   }  /* end of VolPrism */
 
 /***  ReportAF.c  ************************************************************/
-/* consts removed: const I1 ** name and const R8 ** AF */
+/* const removal: const I1 ** name and const R8 ** AF */
 void ReportAF(const IX nSrf, const IX encl, const I1 *title, I1 ** name,
               const R4 *area, const R4 *emit, const IX *base, R8 ** AF, 
               IX flag)
@@ -675,35 +670,4 @@ void ReportAF(const IX nSrf, const IX encl, const I1 *title, I1 ** name,
     }
 
   }  /* end of ReportAF */
-
-/***  FindFile.c  ************************************************************/
-
-/*  Find user designated file.  REPLACE WITH FILEOPEN.TXT ???
- *  First character of type string must be 'r', 'w', or 'a'.  */
-
-void FindFile( I1 *msg, I1 *fileName, I1 *type )
-/*  msg;    message to user
- *  name;   file name (string long enough for any file name)
- *  type;   type of file, see fopen() */
-  {
-  FILE  *pfile=NULL;
-
-  while( !pfile )
-    {
-    if( fileName[0] )   /* try to open file */
-      {
-      pfile = fopen( fileName, type );
-      if( pfile == NULL )
-        fprintf( stderr, "Error! Failed to open: %s\nTry again.\n", fileName );
-      }
-    if( !pfile )        /* ask for file name */
-      {
-      fprintf( stderr, "%s: ", msg );
-      scanf( "%s", fileName );
-      }
-    }
-
-  fclose( pfile );
-
-  }  /*  end of FindFile  */
 

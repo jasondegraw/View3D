@@ -284,12 +284,12 @@ IX BoxTest(SRFDAT3D *srf, SRFDATNM *srfn, SRFDATNM *srfm, VFCTRL *vfCtrl,
 IX ClipPolygon(const IX flag, const IX nv, VERTEX3D *v, R8 *dot, VERTEX3D *vc);
 IX ConeRadiusTest(SRFDAT3D *srf, SRFDATNM *srfn, SRFDATNM *srfm,
                   VFCTRL *vfCtrl, IX *los, IX nProb, R8 distNM);
-IX CylinderRadiusTest(SRFDAT3D *srf, SRFDATNM *srfN, SRFDATNM *srfM,
-                      IX *los, R8 distNM, IX nProb);
+IX CylinderRadiusTest(SRFDAT3D *srf, SRFDATNM *srfN, SRFDATNM *srfM, IX *los,
+                      R8 distNM, IX nProb);
 IX OrientationTest( SRFDAT3D *srf, SRFDATNM *srfn, SRFDATNM *srfm, 
   VFCTRL *vfCtrl, IX *los, IX nProb );
-IX OrientationTestN(SRFDAT3D *srf, IX N, VFCTRL *vfCtrl,
-                    IX *possibleObstr, IX nPossObstr);
+IX OrientationTestN(SRFDAT3D *srf, IX N, VFCTRL *vfCtrl, IX *possibleObstr,
+                    IX nPossObstr);
 void SelfObstructionClip(SRFDATNM *srfn );
 IX SetShape(const IX nv, VERTEX3D *v, R8 *area);
 IX SelfObstructionTest3D(SRFDAT3D *srf1, SRFDAT3D *srf2, SRFDATNM *srfn);
@@ -330,7 +330,7 @@ void DumpVA(I1 *title, const IX rows, const IX cols, R8 *a);
 /* post processing */
 IX DelNull(const IX nSrf, SRFDAT3D *srf, IX *base, IX *cmbn, R4 *emit,
            R4 *area, I1 **name, R8 **AF);
-void NormAF(const nSrf, const R4 *emit, const R4 *area, R8 **AF,
+void NormAF(const IX nSrf, const R4 *emit, const R4 *area, R8 **AF,
             const R8 eMax, const IX itMax );
 IX Combine(const IX nSrf, const IX *cmbn, R4 *area, I1 **name, R8 **AF);
 void Separate(const IX nSrf, const IX *base, R4 *area, R8 **AF);
