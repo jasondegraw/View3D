@@ -162,28 +162,6 @@ IX IntCon( I1 *str, IX *i )
   
   }  /* end of IntCon */
 
-/***  IntStr.c  **************************************************************/
-
-/*  Convert an integer to a string of characters.
- *  Can handle short or long integers by conversion to long.
- *  Static variables required to retain results in calling function.
- *  NMAX allows up to NMAX calls to IntStr() in one statement. 
- *  Replaces nonstandard ITOA & LTOA functions for radix 10.  */
-
-I1 *IntStr( I4 i )
-  {
-  static I1 string[NMAX][12];  // strings long enough for 32-bit integers
-  static index=0;
-
-  if( ++index == NMAX )
-    index = 0;
-
-  sprintf( string[index], "%ld", i );
-
-  return string[index];
-
-  }  /* end of IntStr */
-
 extern FILE *_unxt;   /* NXT input file */
 extern IX _echo;      /* if true, echo NXT input file */
 I1 *_nxtbuf;   /* large buffer for NXT input file */

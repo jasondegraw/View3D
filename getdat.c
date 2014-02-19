@@ -44,162 +44,161 @@ void GetCtrl( I1 *str, VFCTRL *vfCtrl )
   R4 r;
 
   p = strtok( str, "= ," );
-  while( p )
+  while(p)
     {
-    if( STRCMPI( p, "eps" ) == 0 )
+    if(STRCMPI(p, "eps") == 0)
       {
-      p = strtok( NULL, "= ," );
-      if( FltCon( p, &r ) )
-        error( 2, __FILE__, __LINE__, "Bad float value: ", p, "" );
+      p = strtok(NULL, "= ,");
+      if(FltCon(p, &r))
+        error(2, __FILE__, __LINE__, "Bad float value: %s", p);
       else
         {
         vfCtrl->epsAdap = r;
-        if( r < 0.99e-6 )
-          error( 1, __FILE__, __LINE__, "Convergence limit < 1.0e-6", "" );
-        if( r > 1.0e-2 )
-          error( 1, __FILE__, __LINE__, "Convergence limit > 1.0e-2", "" );
+        if(r < 0.99e-6)
+          error(1, __FILE__, __LINE__, "Convergence limit < 1.0e-6");
+        if(r > 1.0e-2)
+          error(1, __FILE__, __LINE__, "Convergence limit > 1.0e-2");
         }
       }
-    else if( STRCMPI( p, "list" ) == 0 )
+    else if(STRCMPI(p, "list") == 0)
       {
       p = strtok( NULL, "= ," );
-      if( IntCon( p, &i ) )
-        error( 2, __FILE__, __LINE__, "Bad integer value: ", p, "" );
+      if(IntCon( p, &i ))
+        error(2, __FILE__, __LINE__, "Bad integer value: %s", p);
       else
         _list = i;
       }
-    else if( STRCMPI( p, "out" ) == 0 )
+    else if(STRCMPI(p, "out") == 0)
       {
-      p = strtok( NULL, "= ," );
-      if( IntCon( p, &i ) )
-        error( 2, __FILE__, __LINE__, "Bad integer value: ", p, "" );
-      else
-        if( i < 0 || i > 2 )
-          error( 2, __FILE__, __LINE__, "Invalid output file format", "" );
+      p = strtok(NULL, "= ,");
+      if(IntCon(p, &i))
+        error(2, __FILE__, __LINE__, "Bad integer value: %s", p);
+      else if(i < 0 || i > 2)
+          error(2, __FILE__, __LINE__, "Invalid output file format");
         else
           vfCtrl->outFormat = i;
       }
-    else if( STRCMPI( p, "encl" ) == 0 )
+    else if(STRCMPI(p, "encl") == 0)
       {
       p = strtok( NULL, "= ," );
-      if( IntCon( p, &i ) )
-        error( 2, __FILE__, __LINE__, "Bad integer value: ", p, "" );
-      else
-        if( i ) vfCtrl->enclosure = 1;
+      if(IntCon(p, &i))
+        error( 2, __FILE__, __LINE__, "Bad integer value: %s", p);
+      else if(i)
+        vfCtrl->enclosure = 1;
       }
-    else if( STRCMPI( p, "emit" ) == 0 )
+    else if(STRCMPI(p, "emit" ) == 0)
       {
-      p = strtok( NULL, "= ," );
-      if( IntCon( p, &i ) )
-        error( 2, __FILE__, __LINE__, "Bad integer value: ", p, "" );
-      else
-        if( i ) vfCtrl->emittances = 1;
+      p = strtok(NULL, "= ,");
+      if(IntCon(p, &i))
+        error(2, __FILE__, __LINE__, "Bad integer value: %s", p);
+      else if(i)
+        vfCtrl->emittances = 1;
       }
-    else if( STRCMPI( p, "maxU" ) == 0 )
+    else if(STRCMPI(p, "maxU") == 0)
       {
-      p = strtok( NULL, "= ," );
-      if( IntCon( p, &i ) )
-        error( 2, __FILE__, __LINE__, "Bad integer value: ", p, "" );
+      p = strtok(NULL, "= ,");
+      if(IntCon(p, &i))
+        error(2, __FILE__, __LINE__, "Bad integer value: %s", p);
       else
         {
-        if( i < 4 )
+        if(i < 4)
           {
-          error( 1, __FILE__, __LINE__,
-            "Maximum unobstructed recursions reset to 4", "" );
+          error(1, __FILE__, __LINE__,
+            "Maximum unobstructed recursions reset to 4");
           i = 4;
           }
-        if( i > 12 )
+        if(i > 12)
           error( 1, __FILE__, __LINE__,
-            "Maximum unobstructed recursions may be too large", "" );
+            "Maximum unobstructed recursions may be too large");
         vfCtrl->maxRecursALI = i;
         }
       }
-    else if( STRCMPI( p, "maxO" ) == 0 )
+    else if(STRCMPI(p, "maxO") == 0)
       {
-      p = strtok( NULL, "= ," );
-      if( IntCon( p, &i ) )
-        error( 2, __FILE__, __LINE__, "Bad integer value: ", p, "" );
+      p = strtok(NULL, "= ,");
+      if(IntCon(p, &i))
+        error(2, __FILE__, __LINE__, "Bad integer value: %s", p);
       else
         {
-        if( i < 4 )
+        if(i < 4)
           {
-          error( 1, __FILE__, __LINE__,
-            "Maximum obstructed recursions reset to 4", "" );
+          error(1, __FILE__, __LINE__,
+            "Maximum obstructed recursions reset to 4");
           i = 4;
           }
-        if( i > 12 )
-          error( 1, __FILE__, __LINE__,
-            "Maximum obstructed recursions may be too large", "" );
+        if(i > 12)
+          error(1, __FILE__, __LINE__,
+            "Maximum obstructed recursions may be too large");
         vfCtrl->maxRecursion = i;
         }
       }
-    else if( STRCMPI( p, "minO" ) == 0 )
+    else if(STRCMPI(p, "minO") == 0)
       {
-      p = strtok( NULL, "= ," );
-      if( IntCon( p, &i ) )
-        error( 2, __FILE__, __LINE__, "Bad integer value: ", p, "" );
+      p = strtok(NULL, "= ,");
+      if(IntCon(p, &i))
+        error(2, __FILE__, __LINE__, "Bad integer value: %s", p);
       else
         {
-        if( i < 0 )
+        if(i < 0)
          i = 0;
-        if( i > 2 )
-          error( 1, __FILE__, __LINE__,
-            "Minimum obstructed recursions may be too large", "" );
+        if(i > 2)
+          error(1, __FILE__, __LINE__,
+            "Minimum obstructed recursions may be too large");
         vfCtrl->minRecursion = i;
         }
       }
-    else if( STRCMPI( p, "row" ) == 0 )
+    else if(STRCMPI(p, "row") == 0)
       {
-      p = strtok( NULL, "= ," );
-      if( IntCon( p, &i ) )
-        error( 2, __FILE__, __LINE__, "Bad integer value: ", p, "" );
+      p = strtok(NULL, "= ,");
+      if(IntCon(p, &i))
+        error(2, __FILE__, __LINE__, "Bad integer value: %s", p);
       else
         {
-        if( i < 0 )
+        if(i < 0)
           i = 0;
         vfCtrl->row = i;
         }
       }
-    else if( STRCMPI( p, "col" ) == 0 )
+    else if(STRCMPI(p, "col") == 0)
       {
-      p = strtok( NULL, "= ," );
-      if( IntCon( p, &i ) )
-        error( 2, __FILE__, __LINE__, "Bad integer value: ", p, "" );
+      p = strtok(NULL, "= ,");
+      if(IntCon(p, &i))
+        error(2, __FILE__, __LINE__, "Bad integer value: %s", p);
       else
         {
-        if( i < 0 )
+        if(i < 0)
           i = 0;
         vfCtrl->col = i;
         }
       }
-    else if( STRCMPI( p, "prjD" ) == 0 )
+    else if(STRCMPI(p, "prjD") == 0)
       {
-      p = strtok( NULL, "= ," );
-      if( IntCon( p, &i ) )
-        error( 2, __FILE__, __LINE__, "Bad integer value: ", p, "" );
-      else
-        if( i ) vfCtrl->prjReverse = 1;
+      p = strtok(NULL, "= ,");
+      if(IntCon(p, &i))
+        error(2, __FILE__, __LINE__, "Bad integer value: %s", p);
+      else if(i)
+        vfCtrl->prjReverse = 1;
       }
-    else if( STRCMPI( p, "maxV" ) == 0 )
+    else if(STRCMPI(p,"maxV") == 0)
       {
-      p = strtok( NULL, "= ," );
-      if( IntCon( p, &i ) )
-        error( 2, __FILE__, __LINE__, "Bad integer value: ", p, "" );
+      p = strtok(NULL, "= ,");
+      if(IntCon(p, &i))
+        error(2, __FILE__, __LINE__, "Bad integer value: %s", p);
       else
         _maxNVT = i;
       }
 
     else
       {
-      error( 1, __FILE__, __LINE__, "Invalid control word: ", p, "" );
+      error(1, __FILE__, __LINE__, "Invalid control word: %s", p);
       p = strtok( NULL, "= ," );
       }
 
-    p = strtok( NULL, "= ," );    // get next word
+    p = strtok(NULL, "= ,");    // get next word
     }
 
   if( vfCtrl->col && !vfCtrl->row )
-    error( 2, __FILE__, __LINE__, "Must set row before setting column", "" );
+    error(2, __FILE__, __LINE__, "Must set row before setting column");
 
   }  /* end GetCtrl */
 
@@ -213,7 +212,7 @@ void CountVS3D( char *title, VFCTRL *vfCtrl )
   IX c;     /* first character in line */
   IX flag=0;  /* NxtWord flag: 0 for first word of first line */
 
-  error( -2, __FILE__, __LINE__, "" );  /* clear error count */
+  error(-2, __FILE__, __LINE__);  /* clear error count */
   vfCtrl->nRadSrf = vfCtrl->nObstrSrf = 0;
 
   while( NxtWord( _string, flag, sizeof(_string) ) != NULL )
@@ -241,11 +240,12 @@ void CountVS3D( char *title, VFCTRL *vfCtrl )
       case 'F':               /* input file format: geometry */
         NxtWord( _string, 0, sizeof(_string) );
         vfCtrl->format = 0;
-        if( streql( _string, "3"  ) ) vfCtrl->format = 3;
-        if( streql( _string, "3a" ) ||
-            streql( _string, "3A" ) ) vfCtrl->format = 4;
-        if( vfCtrl->format < 3 ) error( 2, __FILE__, __LINE__,
-          "Invalid input geometry: ", _string, "" );
+        if( streql( _string, "3"  ) )
+          vfCtrl->format = 3;
+        if( streql( _string, "3a" ) || streql( _string, "3A" ) )
+          vfCtrl->format = 4;
+        if( vfCtrl->format < 3 ) 
+          error(2, __FILE__, __LINE__,"Invalid input geometry: %s", _string);
         break;
       case 'C':               /* C run control data */
         NxtWord( _string, 2, sizeof(_string) );
@@ -260,13 +260,13 @@ void CountVS3D( char *title, VFCTRL *vfCtrl )
     }
 finish:
   vfCtrl->nAllSrf = vfCtrl->nRadSrf + vfCtrl->nObstrSrf;
-  if( vfCtrl->row > vfCtrl->nRadSrf ) error( 2, __FILE__, __LINE__,
-     "\"row\" value too large", "" );
-  if( vfCtrl->col > vfCtrl->nRadSrf ) error( 2, __FILE__, __LINE__,
-     "\"row\" value too large", "" );
+  if( vfCtrl->row > vfCtrl->nRadSrf )
+     error(2, __FILE__, __LINE__,"\"row\" value too large");
+  if( vfCtrl->col > vfCtrl->nRadSrf )
+     error(2, __FILE__, __LINE__,"\"row\" value too large");
 
   if( error( -1, __FILE__, __LINE__, "" )>0 )
-    error( 3, __FILE__, __LINE__, "Fix errors in input data", "" );
+    error(3, __FILE__, __LINE__, "Fix errors in input data");
 
   }  /*  end of CountVS3D  */
 
@@ -281,51 +281,54 @@ void GetSrfD( I1 **name, R4 *emit, IX *base, IX *cmbn,
 
   n = ReadIX( 0 );              /* base surface number */
   base[ns] = n;
-  if( n<0 || n>vfCtrl->nAllSrf ) error( 2, __FILE__, __LINE__,
-    "Improper base surface number:", IntStr(n), "" );
+  if( n<0 || n>vfCtrl->nAllSrf )
+    error( 2, __FILE__, __LINE__,"Improper base surface number: %d",n);
 
   if( n>0 )
     {
     if( srf[ns].type == OBSO )
-      error( 2, __FILE__, __LINE__,
-        "Base surface not permitted for surface ", IntStr(ns), "" );
+      error(2, __FILE__, __LINE__,
+          "Base surface not permitted for surface %d", ns);
     if( srf[ns].type == MASK || srf[ns].type == NULS )
-      if( n<=0 || n>=ns ) error( 2, __FILE__, __LINE__,
-        "A valid base surface number is required for surface ", IntStr(ns), "" );
-    if( srf[ns].type == RSRF && n<=vfCtrl->nRadSrf )
-      if( n>=ns ) error( 2, __FILE__, __LINE__, "Subsurface ", IntStr(ns),
-        "Must be after base surface ", IntStr(n), "" );
+      if(n<=0 || n>=ns) 
+        error( 2, __FILE__, __LINE__,
+          "A valid base surface number is required for surface %d", ns);
+    if(srf[ns].type == RSRF && n<=vfCtrl->nRadSrf)
+      if(n>=ns)
+        error(2, __FILE__, __LINE__, 
+              "Subsurface %d must be after base surface ", ns, n);
     if( srf[ns].type != MASK && srf[ns].type != NULS )
       srf[ns].type = SUBS;
     }
 
   n = ReadIX( 0 );              /* combine surface number */
   cmbn[ns] = n;
-  if( n<0 || n>vfCtrl->nRadSrf ) error( 2, __FILE__, __LINE__,
-     "Improper combine surface number:", IntStr(n), "" );
+  if(n<0 || n>vfCtrl->nRadSrf)
+     error(2, __FILE__, __LINE__,"Improper combine surface number: %d", n);
   else if( n > 0 )
     {
     if( srf[ns].type == MASK || srf[ns].type == NULS || srf[ns].type == OBSO )
-      error( 2, __FILE__, __LINE__,
-        "Combination not permitted for surface ", IntStr(ns), "" );
-    if( n>=ns ) error( 2, __FILE__, __LINE__,
-       "Must combine surface with previous surface:", IntStr(n), "" );
-    if( cmbn[ns] )
-      if( cmbn[n] ) error( 2, __FILE__, __LINE__,
-       "May not chain combined surfaces:", IntStr(n), "" );
+      error(2, __FILE__, __LINE__,
+        "Combination not permitted for surface %d", ns);
+    if(n>=ns) 
+       error(2, __FILE__, __LINE__,
+       "Must combine surface with previous surface: %d", n);
+    if(cmbn[ns])
+      if(cmbn[n])
+       error( 2, __FILE__, __LINE__,"May not chain combined surfaces : %d", n);
     }
 
   emit[ns] = ReadR4( 0 );       /* surface emittance */
-  if( emit[ns] > 0.99901 )
+  if(emit[ns] > 0.99901)
     {
-    error( 1, __FILE__, __LINE__,  "Replacing surface ", IntStr(ns),
-       " emittance (", _string, ") with 0.999", "" );
+    error(1, __FILE__, __LINE__,  
+       "Replacing surface %d emittance (%s) with 0.999", ns, _string);
     emit[ns] = 0.999f;
     }
   if( emit[ns] < 0.00099f )
     {
-    error( 1, __FILE__, __LINE__,  "Replacing surface ", IntStr(ns),
-       " emittance (", _string, ") with 0.001", "" );
+    error(1, __FILE__, __LINE__,
+       "Replacing surface %d emittance %s with 0.001", ns, _string);
     emit[ns] = 0.001f;
     }
 
@@ -348,19 +351,19 @@ void GetVS3D( I1 **name, R4 *emit, IX *base, IX *cmbn,
   IX n;
   IX flag=0;  /* NxtWord flag: 0 for first word of first line */
 
-  error( -2, __FILE__, __LINE__, "" );  /* clear error count */
+  error(-2, __FILE__, __LINE__);  /* clear error count */
   rewind( _unxt );
 
-  while( NxtWord( _string, flag, sizeof(_string) ) != NULL )
+  while(NxtWord(_string, flag, sizeof(_string)) != NULL)
     {
-    c = toupper( _string[0] );
-    switch( c )
+    c = toupper(_string[0]);
+    switch(c)
       {
       case 'V':
-        n = ReadIX( 0 );
+        n = ReadIX(0);
         nv += 1;
-        if( n!= nv ) error( 2, __FILE__, __LINE__,
-          "Vertex: ", IntStr(n), " out of sequence", "" );
+        if(n!= nv) 
+          error(2, __FILE__, __LINE__, "Vertex %d out of sequence", n );
         xyz[nv].x = ReadR8( 0 );
         xyz[nv].y = ReadR8( 0 );
         xyz[nv].z = ReadR8( 0 );
@@ -369,14 +372,16 @@ void GetVS3D( I1 **name, R4 *emit, IX *base, IX *cmbn,
       case 'N':               /* "null" surface */
       case 'S':
       case 'O':
-        n = ReadIX( 0 );
+        n = ReadIX(0);
         ns += 1;
-        if( n!= ns ) error( 2, __FILE__, __LINE__,
-          "Surface: ", IntStr(n), " out of sequence", "" );
-        if( c=='O' && n<=vfCtrl->nRadSrf ) error( 2, __FILE__, __LINE__,
-           "Obstruction surface: ", IntStr(n), " out of sequence", "" );
-        if( c=='S' && n>vfCtrl->nRadSrf ) error( 2, __FILE__, __LINE__,
-           "Radiating surface: ", IntStr(n), " out of sequence", "" );
+        if(n!= ns)
+          error(2, __FILE__, __LINE__, "Surface %d out of sequence", n);
+        if(c=='O' && n<=vfCtrl->nRadSrf)
+           error(2, __FILE__, __LINE__,
+             "Obstruction surface %d out of sequence", n);
+        if( c=='S' && n>vfCtrl->nRadSrf )
+           error( 2, __FILE__, __LINE__,
+             "Radiating surface: %d out of sequence", n);
         srf[ns].nr = ns;
         if( c == 'S' )
           srf[ns].type = RSRF;
@@ -387,27 +392,31 @@ void GetVS3D( I1 **name, R4 *emit, IX *base, IX *cmbn,
         else if( c == 'M' )
           srf[ns].type = MASK;
 
-        n = ReadIX( 0 );
-        if( n<=0 || n>vfCtrl->nVertices ) error( 2, __FILE__, __LINE__,
-          "Surface ", IntStr(ns), "- improper first vertex:", IntStr(n), "" );
+        n = ReadIX(0);
+        if(n<=0 || n>vfCtrl->nVertices)
+          error(2, __FILE__, __LINE__,
+            "Surface %d - improper first vertex: %d", ns, n);
         else
           srf[ns].v[0] = xyz + n;
 
         n = ReadIX( 0 );
-        if( n<=0 || n>vfCtrl->nVertices ) error( 2, __FILE__, __LINE__,
-          "Surface ", IntStr(ns), "- improper second vertex:", IntStr(n), "" );
+        if( n<=0 || n>vfCtrl->nVertices )
+          error( 2, __FILE__, __LINE__,
+            "Surface %d - improper second vertex: %d", ns, n);
         else
           srf[ns].v[1] = xyz + n;
 
         n = ReadIX( 0 );
-        if( n<=0 || n>vfCtrl->nVertices ) error( 2, __FILE__, __LINE__,
-          "Surface ", IntStr(ns), "- improper third vertex:", IntStr(n), "" );
+        if(n<=0 || n>vfCtrl->nVertices)
+          error( 2, __FILE__, __LINE__,
+            "Surface %d - improper third vertex: %d", ns, n);
         else
           srf[ns].v[2] = xyz + n;
 
         n = ReadIX( 0 );
-        if( n<0 || n>vfCtrl->nVertices ) error( 2, __FILE__, __LINE__,
-          "Surface ", IntStr(ns), "- improper fourth vertex:", IntStr(n), "" );
+        if(n<0 || n>vfCtrl->nVertices)
+          error(2, __FILE__, __LINE__,
+            "Surface %d - improper fourth vertex: %d", ns, n);
         if( n == 0 )
           srf[ns].nv = 3;
         else
@@ -436,8 +445,8 @@ void GetVS3D( I1 **name, R4 *emit, IX *base, IX *cmbn,
         goto finish;
 
       default:
-        error( 1, __FILE__, __LINE__,
-          "Undefined input identifier: ", _string, "" );
+        error(1, __FILE__, __LINE__, "Undefined input identifier: %s",
+              _string);
         break;
       }
 	flag = 1;
@@ -446,8 +455,8 @@ void GetVS3D( I1 **name, R4 *emit, IX *base, IX *cmbn,
 finish:
   TestSubSrf( srf, base, vfCtrl );
 
-  if( error( -1, __FILE__, __LINE__, "" )>0 )
-    error( 3, __FILE__, __LINE__, "Fix errors in input data", "" );
+  if(error(-1, __FILE__, __LINE__)>0)
+    error(3, __FILE__, __LINE__, "Fix errors in input data");
 
   }  /*  end of GetVS3D  */
 
@@ -473,27 +482,29 @@ void GetVS3Da( I1 **name, R4 *emit, IX *base, IX *cmbn,
   IX ns=0;    /* number of surfaces */
   IX j, n;
 
-  error( -2, __FILE__, __LINE__, "" );  /* clear error count */
-  rewind( _unxt );
-  NxtWord( _string, -1, sizeof(_string) );
+  error(-2, __FILE__, __LINE__);  /* clear error count */
+  rewind(_unxt);
+  NxtWord(_string, -1, sizeof(_string));
 
-  while( NxtWord( _string, 1, sizeof(_string) ) != NULL )
+  while(NxtWord(_string, 1, sizeof(_string)) != NULL)
     {
-    c = toupper( _string[0] );
+    c = toupper(_string[0]);
     switch( c )
       {
       case 'S':
       case 'O':
       case 'M':
       case 'N':
-        n = ReadIX( 0 );
+        n = ReadIX(0);
         ns += 1;
-        if( n!= ns ) error( 2, __FILE__, __LINE__,
-           "Surface out of sequence:", IntStr(n), "" );
-        if( c=='O' && n<=vfCtrl->nRadSrf ) error( 2, __FILE__, __LINE__,
-           "Obstruction surface out of sequence:", IntStr(n), "" );
-        if( c=='S' && n>vfCtrl->nRadSrf ) error( 2, __FILE__, __LINE__,
-           "Radiating surface out of sequence:", IntStr(n), "" );
+        if( n!= ns )
+          error( 2, __FILE__, __LINE__, "Surface out of sequence: %d", n);
+        if( c=='O' && n<=vfCtrl->nRadSrf )
+           error(2, __FILE__, __LINE__,
+             "Obstruction surface out of sequence: %d", n);
+        if( c=='S' && n>vfCtrl->nRadSrf )
+           error( 2, __FILE__, __LINE__,
+             "Radiating surface out of sequence: %d", n);
         srf[ns].nr = ns;
         if( c == 'S' )
           srf[ns].type = RSRF;
@@ -547,8 +558,8 @@ void GetVS3Da( I1 **name, R4 *emit, IX *base, IX *cmbn,
             }
           }
         else
-          error( 2, __FILE__, __LINE__,
-            "Invalid shape identifier: surface ", IntStr(ns), "" );
+          error(2, __FILE__, __LINE__,
+            "Invalid shape identifier: surface %d", ns);
 
         v[0].z = v[1].z = v[2].z = v[3].z = 0.0;
         for( j=0; j<4; j++ )
@@ -579,8 +590,8 @@ void GetVS3Da( I1 **name, R4 *emit, IX *base, IX *cmbn,
         goto finish;
 
       default:
-        error( 1, __FILE__, __LINE__,
-          "Undefined input identifier: ", _string, "" );
+        error(1, __FILE__, __LINE__,"Undefined input identifier: %s", 
+          _string);
         break;
       }
     }
@@ -588,8 +599,8 @@ void GetVS3Da( I1 **name, R4 *emit, IX *base, IX *cmbn,
 finish:
   TestSubSrf( srf, base, vfCtrl );
 
-  if( error( -1, __FILE__, __LINE__, "" )>0 )
-    error( 3, __FILE__, __LINE__, "Fix errors in input data", "" );
+  if(error(-1, __FILE__, __LINE__)>0)
+    error(3, __FILE__, __LINE__, "Fix errors in input data");
 
   }  /*  end of GetVS3Da  */
 
@@ -648,7 +659,7 @@ void SetPlane( SRFDAT3D *srf )
     srf->dc.w = -VDOT( (&srf->dc), (&srf->ctd) );
     srf->shape = SetShape( 4, p, a+4 );
     if( fabs(a[4] - srf->area) > 1.0e-6 * (a[4] + srf->area) )
-      error( 2, __FILE__, __LINE__, "Bad area calculation", "" );
+      error(2, __FILE__, __LINE__, "Bad area calculation");
     for( j=0; j<4; j++ )    /* flatness test */
       z[j] = VDOTW( (srf->v[j]), (&srf->dc) ) / srf->rc;
     for( j=0; j<4; j++ )
@@ -659,8 +670,8 @@ void SetPlane( SRFDAT3D *srf )
         err = 2;
     if( err )
       {
-      error( err, __FILE__,  __LINE__,
-        "Vertices not in common plane: surface ", IntStr(srf->nr), "" );
+      error(err, __FILE__,  __LINE__,
+        "Vertices not in common plane: surface %d", srf->nr);
       for( j=0; j<4; j++ )
         if( fabs( a[j] ) > 3.0e-6 )
           fprintf( _ulog, "  vertex %d: relative error %.2e\n", j, a[j] );
@@ -668,9 +679,11 @@ void SetPlane( SRFDAT3D *srf )
     else
       {
       for( j=0; j<4; j++ )       /* test for convex polygon */
-        if( VDOT( (&srf->dc), (dct+j) ) < 0.999 ) break;
-      if( j<4 ) error( 2, __FILE__,  __LINE__,
-        "Non-convex polygon: surface ", IntStr(srf->nr), "" );
+        if( VDOT( (&srf->dc), (dct+j) ) < 0.999 )
+         break;
+      if( j<4 )
+        error(2, __FILE__,  __LINE__,
+        "Non-convex polygon: surface %d", srf->nr);
       }
     }
   else if( srf->nv==3 )          /* is a triangle */
@@ -680,7 +693,7 @@ void SetPlane( SRFDAT3D *srf )
     srf->shape = 3;
     }
   else
-    error( 2, __FILE__,  __LINE__,  " Incorrect number of vertices", "" );
+    error(2, __FILE__,  __LINE__,  " Incorrect number of vertices");
 
   }  /* end of SetPlane */
 
@@ -716,24 +729,25 @@ void TestSubSrf( SRFDAT3D *srf, const IX *baseSrf, VFCTRL *vfCtrl )
       if( dot > eps ) infront = 1;
       if( dot < -eps ) behind = 1;
       }
-    if( infront || behind )
+    if(infront || behind)
       {
-      error( 2, __FILE__, __LINE__, " Subsurface ",
-        IntStr(n), " not in plane of base ", IntStr(m), "" );
+      error(2, __FILE__, __LINE__,
+        "Subsurface %d not in plane of base %d", n, m);
       continue;
       }
-                                /* test surface orintations */
+    /* test surface orientations */
     dot = VDOT( (&srf[n].dc), (&srf[m].dc) );
     if( srf[n].type == SUBS && dot < 0.999 )
       {
-      error( 2, __FILE__, __LINE__, " Subsurface ",
-        IntStr(n), " should face same direction as base", "" );
+      error(2, __FILE__, __LINE__,
+        "Subsurface %d should face same direction as base %d", n, m);
       continue;
       }
-    if( (srf[n].type == MASK || srf[n].type == NULS ) && dot > -0.999 )
+    if((srf[n].type == MASK || srf[n].type == NULS) && dot > -0.999)
       {
-      error( 2, __FILE__, __LINE__, "Mask/null surfacee ",
-        IntStr(n), " should face opposite direction as base", "" );
+      error(2, __FILE__, __LINE__, 
+        "Mask/null surface %d should face opposite direction as base %d",
+        n, m);
       continue;
       }
                                 /* test surface enclosure */
@@ -772,8 +786,9 @@ void TestSubSrf( SRFDAT3D *srf, const IX *baseSrf, VFCTRL *vfCtrl )
     if( subs && base )
       {
       if( PolygonOverlap( base, subs, 3, 0 ) != 1 )  /* 1 = enclosed */
-        error( 2, __FILE__, __LINE__, " Subsurface ",
-          IntStr(n), " is not (entirely?) within its base", "" );
+        error(2, __FILE__, __LINE__,
+          "Subsurface %d is not (entirely?) within its base %d",
+          n, m);
       }
     else
       {

@@ -150,7 +150,7 @@ void SaveVF( I1 *fileName, I1 *program, I1 *version,
     }
   else
     {
-    error( 3, __FILE__, __LINE__, "Undefined format: ", IntStr(format), "" );
+    error(3, __FILE__, __LINE__, "Undefined format: %d", format);
 //    SaveAF( fileName, header, nSrf, title, name, area, emit, AF );
     }
 

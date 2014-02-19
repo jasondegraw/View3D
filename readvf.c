@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include "types.h"
 IX error( IX severity, I1 *file, IX line, ... );
-I1 *IntStr( I4 i );
 
 /***  ReadF0s.c  *************************************************************/
 
@@ -151,7 +150,7 @@ void ReadVF( I1 *fileName, I1 *program, I1 *version,
         ReadF1s( fileName, ns, area, emit, F );
       }
     else
-      error( 3, __FILE__, __LINE__, "Undefined format: ", IntStr(*format), "" );
+      error(3, __FILE__, __LINE__, "Undefined format: %d", *format);
     }
 
   }  /* end ReadVF */

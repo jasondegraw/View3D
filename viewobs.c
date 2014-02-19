@@ -105,10 +105,14 @@ R8 ViewObstructed( VFCTRL *vfCtrl, IX nv1, VERTEX3D v1[], R8 area, IX nDiv )
   ymin = ymax = vb[0].y;
   for( n=1; n<nvb; n++ )        /* determine polygon 2 to limits */
     {
-    if( vb[n].x < xmin ) xmin = vb[n].x;
-    if( vb[n].x > xmax ) xmax = vb[n].x;
-    if( vb[n].y < ymin ) ymin = vb[n].y;
-    if( vb[n].y > ymax ) ymax = vb[n].y;
+    if(vb[n].x < xmin)
+      xmin = vb[n].x;
+    if(vb[n].x > xmax)
+      xmax = vb[n].x;
+    if(vb[n].y < ymin)
+      ymin = vb[n].y;
+    if(vb[n].y > ymax)
+      ymax = vb[n].y;
     }
 #if( DEBUG > 1 )
   DumpP2D( "Base Surface:", nvb, vb );

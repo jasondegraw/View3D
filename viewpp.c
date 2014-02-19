@@ -293,8 +293,8 @@ void LUFactorSymm( const IX neq, R8 **a )
       a[i][j] = tmp;
       }
     a[i][i] -= dot;
-    if( a[i][i] == 0.0 ) error( 3, __FILE__, __LINE__,
-        "Zero on the diagonal, row ", IntStr( i ), "" );
+    if(a[i][i] == 0.0) error(3, __FILE__, __LINE__,
+        "Zero on the diagonal, row %d", i);
     a[i][i] = 1.0 / a[i][i];
     }  /*  end of i loop  */
 
