@@ -18,8 +18,10 @@
 /*  along with View3D.  If not, see <http://www.gnu.org/licenses/>.           */
 /*                                                                            */
 /******************************************************************************/
-/*    Utility Functions   */
-
+/*                                                                            */
+/*    Utility Functions                                                       */
+/*                                                                            */
+/******************************************************************************/
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -27,19 +29,17 @@
 #include "types.h"  /* define U1, I2, etc.  */
 #include "prtyp.h"  /* miscellaneous function prototypes */
 
-extern FILE *_ulog;   /* LOG output file */
-extern I1 _string[LINELEN];  /* buffer for ReadXX(); helps debugging */
-
-#define NMAX 4        /* maximum number of calls to xxxStr at one time */
-#if( __TURBOC__ )
-# define BIGBUF 1     /* Control buffering in NxtWrd() and FileCopy() */
-#else                 /* size of large buffer; >= 5120 to be useful */
-# define BIGBUF 5120
+#ifndef _WIN32 /* Try to use rusage routines on non-Windows machines */
+#define USE_RUSAGE
 #endif
 
-IX _emode=1;   /* error message mode: 0=logFile, 1=DOS console, 2=Windows */
+#ifdef USE_RUSAGE
+#include <sys/time.h>
+#include <sys/resource.h>
+#endif
 
-
+extern FILE *_ulog;   /* LOG output file */
+extern I1 _string[LINELEN];  /* buffer for ReadXX(); helps debugging */
 
 /***  error  ******************************************************************/
 
@@ -56,14 +56,12 @@ IX error(IX severity, I1 *file, IX line, ...)
   static IX count=0;   /* count of severe errors */
   static const I1 *head[4] = { "NOTE", "WARNING", "ERROR", "FATAL" };
 
-  if(severity >= 0)
-  {
-    if(severity>3)
+  if(severity >= 0) {
+    if(severity>3) {
       severity = 3;
-    else if(severity==2)
+    } else if(severity==2) {
       count += 1;
-    //fprintf(stderr, "%s %s (%s,%d): ", PROGRAMNAME, head[severity],
-    //    file, line);
+    }
     fprintf(_ulog, "%s %s (%s,%d): ", PROGRAMSTR, head[severity],
             file, line);
     //va_start(args, format);
@@ -72,36 +70,17 @@ IX error(IX severity, I1 *file, IX line, ...)
     //vfprintf(stderr, format, args);
     vfprintf(_ulog, format, args);
     va_end(args);
-    if(severity > 2)
+    if(severity > 2) {
       exit(EXIT_FAILURE);
+     }
       //fputs("\n", stderr);
     fputs("\n", _ulog);
   }
-  else if( severity < -1 )   /* clear error count */
+  else if( severity < -1 ) {   /* clear error count */
     count = 0;
-
+  }
   return count;
   }  /*  end error  */
-
-/***  sfname.c  ***************************************************************/
-
-/*  Return pointer to file name from the full path name.  */
-
-I1 *sfname( I1* fullpath )
-  {
-  I1 *name=fullpath, *c;  // allow for name == fullpath
-
-  for( c=fullpath; *c; c++ )  // find last dir char before name
-    {
-    if( *c == '/' ) name = c+1;
-    if( *c == '\\' ) name = c+1;
-    if( *c == ':' ) name = c+1;
-    }
-
-  return name;
-
-  }  /* end sfname */
-
 
 #include <limits.h> /* define: SHRT_MAX, SHRT_MIN */
 
@@ -150,14 +129,21 @@ IX IntCon( I1 *str, IX *i )
   I4 value;    /* compute result in long integer, then chop */
   IX eflag=0;
 
-  if( LongCon( str, &value ) ) eflag = 1;
-  if( value > SHRT_MAX ) eflag = 1;
-  if( value < SHRT_MIN ) eflag = 1;
+  if(LongCon(str, &value)) {
+    eflag = 1;
+  }
+  if(value > SHRT_MAX) {
+    eflag = 1;
+  }
+  if(value < SHRT_MIN) {
+    eflag = 1;
+  }
 
-  if( eflag )
+  if(eflag) {
     *i = 0;
-  else
+  } else {
     *i = (IX)value;
+  }
   return eflag;
   
   }  /* end of IntCon */
@@ -480,7 +466,7 @@ IX FltCon( I1 *str, R4 *f )
 
 #include <time.h>   /* prototype: clock;  define CLOCKS_PER_SEC */
 
-/***  CPUtime.c  *************************************************************/
+/***  CPUtime  ****************************************************************/
 
 /*  Determine elapsed time.  Call once to determine t1;
     call later to get elapsed time. */
@@ -488,29 +474,16 @@ IX FltCon( I1 *str, R4 *f )
 R4 CPUtime( R4 t1 )
   {
   R4 t2;
-
-  t2 = (R4)clock() / (R4)CLOCKS_PER_SEC;
+#ifdef USE_RUSAGE
+  struct rusage r2;
+  getrusage(RUSAGE_SELF,&r2);
+  t2 = (R4)r2.ru_utime.tv_sec + 1.0e-6*r2.ru_utime.tv_usec;
+#else
+  t2 = (R4) clock() / (R4) CLOCKS_PER_SEC;
+#endif
   return (t2-t1);
 
   }  /* end CPUtime */
 
 
-/***  streql.c  **************************************************************/
-
-/*  Test for equality of two strings; return 1 if equal, 0 if not.
- *  Benchmark tests with optimized Visual C++ 7.0 indicate this 
- *  function is faster if strings differ in first 3 characters, 
- *  !strcmp( s1, s2 ) is faster otherwise.   */
-
-IX streql( I1 *s1, I1 *s2 )
-  {
-  for( ; *s1; s1++, s2++ )   // not checking for s2 NULL
-    if( *s1 != *s2 ) break;
-
-  if( *s1 == *s2 )  // both must equal '\0'
-    return 1;
-  else              // either might equal '\0'
-    return 0;
-
-  }  /* end of streql */
 

@@ -67,8 +67,8 @@ R8 ViewUnobstructed( VFCTRL *vfCtrl, IX row, IX col )
   R8 area1[16], area2[16];
   SRFDAT3X *srf1;  /* pointer to surface 1 */
   SRFDAT3X *srf2;  /* pointer to surface 2 */
-  R8 AF0,  /* estimate of AF */
-     AF1;  /* improved estimate; one more edge division */
+  R8 AF0;  /* estimate of AF */
+  R8 AF1;  /* improved estimate; one more edge division */
   IX nmax, mmax;
   IX nDiv;
 
@@ -564,7 +564,8 @@ R8 ViewALI( const IX nv1, const VERTEX3D *v1,
         v2[j].x, v2[j].y, v2[j].z, v2[jp1].x, v2[jp1].y, v2[jp1].z );
 #endif
       dot = VDOT( (&B), (A+i) ) / ( b * a[i] );
-      if( fabs(dot) <= EPS ) continue;
+      if(fabs(dot) <= EPS)
+        continue;
 #if( DEBUG > 1 )
       fprintf( _ulog, " ViewALI: j=%d i=%d b %f a %f dot %f\n",
         j, i, b, a[i], dot );
@@ -823,7 +824,8 @@ IX GQTriangle( const IX nDiv, const VERTEX3D *vt, VERTEX3D *p, R8 *w )
  * p    - coordinates of Gaussian points
  * w    - Gaussian weights */
   static const IX offset[4] = { 0, 1, 5, 12 };
-  static const R8 gx[25][4] = {  /* Gaussian ordinates & weights */
+/* Gaussian ordinates & weights */
+  static const R8 gx[25][4] = {  
      {0.33333333, 0.33333333, 0.33333333, 1.00000000 },  /* 1-point */
 
      {0.33333333, 0.33333333, 0.33333333, -0.5625000 },  /* 4-point */
@@ -851,8 +853,8 @@ IX GQTriangle( const IX nDiv, const VERTEX3D *vt, VERTEX3D *p, R8 *w )
      {0.31286550, 0.63844419, 0.04869031, 0.07711376 },
      {0.31286550, 0.04869031, 0.63844419, 0.07711376 },
      {0.04869031, 0.63844419, 0.31286550, 0.07711376 },
-     {0.04869031, 0.31286550, 0.63844419, 0.07711376 }
-                             };  /* Gaussian ordinates & weights */
+     {0.04869031, 0.31286550, 0.63844419, 0.07711376 } };
+
   static const IX nss[4] = { 1, 4, 7, 13 };  /* number of subsurfaces */
   IX nSubSrf;       /* number of subsurfaces */
   IX j, n;

@@ -81,7 +81,7 @@ void *Alc_E( I4 length, I1 *file, IX line )
   U4 *pt;    // pointer to heap guard bytes
 # if( MEMTEST > 1 )
   MEMLIST *pml;
-  I1 *fname;
+  //I1 *fname;
 # endif
 #endif
 
@@ -107,18 +107,18 @@ void *Alc_E( I4 length, I1 *file, IX line )
 #endif
 
 #if( MEMTEST > 1 )
-  fname = sfname( file );
-  pml = calloc( sizeof(MEMLIST) + strlen(fname), 1 );  // note:
+  //fname = sfname( file );
+  pml = calloc( sizeof(MEMLIST) + strlen(file), 1 );  // note:
   pml->pam = p;            // allocation to store file name;
   pml->length = length;    // no recursive call to Alc_e().
   pml->line = line;
-  strcpy( pml->file, fname );
+  strcpy( pml->file, file );
   if( _memList )
     pml->next = _memList;  // stack data structure
   _memList = pml;
 # if( MEMTEST > 2 )
   fprintf( _ulog, "Allocate %5ld bytes at [%p] at line %d in %s\n",
-    length, p, line, fname );
+    length, p, line, file );
   fflush( _ulog );
 # endif
 #endif
@@ -584,9 +584,7 @@ void *Alc_V( IX min_index, I4 max_index, IX size, I1 *file, IX line )
 
   if( length < 1 )
     {
-    sprintf( _heapmsg, "Max index (%d) < min index (%d)",
-      max_index, min_index );
-    error( 3, file, line, _heapmsg, "" );
+    error( 3, file, line,"Max index (%d) < min index (%d)", max_index, min_index);
     }
 
 #if( ANSIOFFSET > 0 )
