@@ -1,4 +1,32 @@
-/*subfile:  heap.c  **********************************************************/
+/*subfile:  heap.c  ***********************************************************/
+/*                                                                            */
+/*  This file is part of View3D.                                              */
+/*                                                                            */
+/*  View3D is distributed in the hope that it will be useful, but             */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of                */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                      */
+/*                                                                            */
+/*  This file has not been substantially changed from the original            */
+/*  public domain version made available with the disclaimer below,           */
+/*  and is thus in the public domain.                                         */
+/*                                                                            */
+/*  Original NIST Disclaimer:                                                 */
+/*                                                                            */
+/*  This software was developed at the National Institute of Standards        */
+/*  and Technology by employees of the Federal Government in the              */
+/*  course of their official duties. Pursuant to title 17 Section 105         */
+/*  of the United States Code this software is not subject to                 */
+/*  copyright protection and is in the public domain. These programs          */
+/*  are experimental systems. NIST assumes no responsibility                  */
+/*  whatsoever for their use by other parties, and makes no                   */
+/*  guarantees, expressed or implied, about its quality, reliability,         */
+/*  or any other characteristic.  We would appreciate acknowledgment          */
+/*  if the software is used. This software can be redistributed and/or        */
+/*  modified freely provided that any derivative works bear some              */
+/*  notice that they are derived from it, and any modified versions           */
+/*  bear some notice that they have been modified.                            */
+/*                                                                            */
+/******************************************************************************/
 
 /*  Functions for heap (memory) processing.
  *  All allocations occur through the Alc_E() function.
@@ -354,207 +382,6 @@ void MemRem( I1 *msg )
 #endif
 
   }  /* end of MemRem */
-
-/***  Alc_EC.c  **************************************************************/
-
-/*  Allocate small structures within a larger allocated block.
- *  This saves quite a bit of memory allocation overhead and is faster than
- *  calling Alc_E() for each small structure. Especially fast for deallocation
- *  because the entire block is freed. Cannot free the individual structures.
- *  Based on idea and code by Steve Weller, "The C Users Journal",
- *  April 1990, pp 103 - 107.
- *  Must begin with Alc_ECI for initialization; free with Fre_EC.  */
-
-typedef struct memblock   // block of memory for Alc_EC() allocation
-  {
-  struct memblock *prevBlock;  // pointer to previous block
-  struct memblock *nextBlock;  // pointer to next block
-  I4 blockSize;   // number of bytes in block
-  I4 dataOffset;  // offset to free space
-  } MEMBLOCK;
-
-void *Alc_EC( I1 **block, I4 size, I1 *file, IX line )
-/*  block;  pointer to current memory block.
- *  size;   size (bytes) of structure being allocated.
- *  file;   name of file for originating call.
- *  line;   line in file. */
-  {
-  I1 *p;  // pointer to the structure
-  MEMBLOCK *mb, // current memory block
-           *nb; // next memory block
-
-  if( size < 1 )
-    {
-    sprintf( _heapmsg, "Element too small to allocate: %ld bytes\n", size );
-    error( 3, file, line, _heapmsg, "" );
-    }
-
-  // Set memory alignment.
-#ifdef __TURBOC__
-  size = (size+3) & 0xFFFC;   // 16 bit; multiple of 4
-#else
-  size = (size+7) & 0xFFFFFFF8;   // 32 bit; multiple of 8
-#endif
-  mb = (void *)*block;
-  if( size > mb->blockSize - (I4)sizeof(MEMBLOCK) )
-    {
-    sprintf( _heapmsg, "Requested size (%ld) larger than block (%ld)",
-      size, mb->blockSize - (I4)sizeof(MEMBLOCK) );
-    error( 3, file, line, _heapmsg, "" );
-    }
-  if( mb->dataOffset + size > mb->blockSize )
-    {
-    if( mb->nextBlock )
-      nb = mb->nextBlock;     // next block already exists
-    else
-      {                       // else create next block
-      nb = (MEMBLOCK *)Alc_E( mb->blockSize, file, line );
-      nb->prevBlock = mb;     // back linked list
-      mb->nextBlock = nb;     // forward linked list
-      nb->nextBlock = NULL;
-      nb->blockSize = mb->blockSize;
-      nb->dataOffset = sizeof(MEMBLOCK);
-      }
-    mb = nb;
-    *block = (void *)nb;
-    }
-  p = *block + mb->dataOffset;
-  mb->dataOffset += size;
-
-  return (void *)p;
-
-  }  /*  end of Alc_EC  */
-
-/***  Alc_ECI.c  *************************************************************/
-
-/*  Block initialization for Alc_EC.  Use:
- *    I1 *_ms;    // memory block for small structures
- *    _ms = (I1 *)alc_eci( 2000, "ms-block" );  */
-
-void *Alc_ECI( I4 size, I1 *file, IX line )
-/*  size;   size (bytes) of block being allocated.
- *  file;   name of file for originating call.
- *  line;   line in file. */
-  {
-  MEMBLOCK *mb;
-
-  if( size > UINT_MAX )
-    {
-    sprintf( _heapmsg, "Requested size (%ld) larger than unsigned int", size );
-    error( 3, file, line, _heapmsg, "" );
-    }
-
-  mb = Alc_E( size, file, line );
-  mb->prevBlock = NULL;
-  mb->nextBlock = NULL;
-  mb->blockSize = size;
-  mb->dataOffset = sizeof(MEMBLOCK);
-
-  return mb;
-
-  }  /*  end of Alc_ECI  */
-
-#if( MEMTEST > 0 )
-/***  Chk_EC.c  **************************************************************/
-
-/*  Check data blocks allocated by Alc_EC.  */
-
-void Chk_EC( I1 *block, I1 *file, IX line )
-/*  block;  pointer to current (last in list) memory block. */
-  {
-  IX status=0;
-  MEMBLOCK *mb;
-
-  for( mb=(void *)block; mb->nextBlock; mb=mb->nextBlock )
-    {
-    U1 *p = (void *)mb;
-    U4 *pt = (U4 *)(p + mb->blockSize);
-    if( *pt != MCHECK )
-      {
-      error( 2, file, line, "Overrun at end of data allocation", "" );
-      status = 1;
-      }
-    if( mb->dataOffset < sizeof(MEMBLOCK) ||
-        mb->dataOffset > mb->blockSize )
-      {
-      error( 2, file, line, "Overrun before data allocation", "" );
-      status = 1;
-      }
-
-    if( status )
-      {
-# if( MEMTEST > 1 )
-    MEMLIST *pml;
-    for( pml=_memList; pml; pml=pml->next )
-      if( pml->pam == p )  // report allocation data
-        {
-        sprintf( _heapmsg, "Memory was allocated at line %d in file %s.",
-          pml->line, pml->file );
-        error( 0, file, line, _heapmsg, "" );
-        break;
-        }
-# endif
-#if( _MSC_VER )  // Overrun causes crash in MS C++ 
-      error( 3, __FILE__, __LINE__, "Fix memory overrun error", "" );
-#endif
-      }
-    }
-
-  }  /*  end of Chk_EC  */
-#endif
-
-/***  Clr_EC.c  **************************************************************/
-
-/*  Clear (but do not free) blocks allocated by Alc_EC.
- *  Return pointer to first block in linked list.  */
-
-void *Clr_EC( I1 *block )
-/*  block;  pointer to current (last in list) memory block. */
-  {
-  I1 *p;      /* pointer to the block */
-  MEMBLOCK *mb, *nb;
-  IX header=sizeof(MEMBLOCK);  // size of header data
-
-  for( mb=(void *)block; mb->nextBlock; mb=mb->nextBlock )
-    ;  // guarantee mb at end of list
-
-  while( mb )
-    {
-    p = (void *)mb;
-    nb = mb->prevBlock;
-    memset( p + header, 0, mb->blockSize - header );
-    mb->dataOffset = header;
-    mb = nb;
-    }
-
-  return (void *)p;
-
-  }  /*  end of Clr_EC  */
-
-/***  Fre_EC.c  **************************************************************/
-
-/*  Free blocks allocated by Alc_EC.  */
-
-void *Fre_EC( I1 *block, I1 *file, IX line )
-/*  block;  pointer to current memory block.
- *  file;   name of file for originating call.
- *  line;   line in file. */
-  {
-  MEMBLOCK *mb, *nb;
-
-  for( mb=(void *)block; mb->nextBlock; mb=mb->nextBlock )
-    ;  // guarantee mb at end of list
-
-  while( mb )
-    {
-    nb = mb->prevBlock;
-    Fre_E( mb, mb->blockSize, file, line );
-    mb = nb;
-    }
-
-  return (NULL);
-
-  }  /*  end of Fre_EC  */
 
 #define ANSIOFFSET 0 // 1 = include V[0] in vector allocation
 

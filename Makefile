@@ -16,7 +16,8 @@ obj   = ctrans.o \
 	view3d.o \
 	viewobs.o \
 	viewpp.o \
-	viewunob.o
+	viewunob.o \
+	tmpstore.o
 #
 progs = View3D
 #

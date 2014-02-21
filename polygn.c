@@ -1,5 +1,32 @@
-/*subfile:  polygn.c  ********************************************************/
-
+/*subfile:  polygn.c  *********************************************************/
+/*                                                                            */
+/*  This file is part of View3D.                                              */
+/*                                                                            */
+/*  View3D is distributed in the hope that it will be useful, but             */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of                */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                      */
+/*                                                                            */
+/*  This file has not been substantially changed from the original            */
+/*  public domain version made available with the disclaimer below,           */
+/*  and is thus in the public domain.                                         */
+/*                                                                            */
+/*  Original NIST Disclaimer:                                                 */
+/*                                                                            */
+/*  This software was developed at the National Institute of Standards        */
+/*  and Technology by employees of the Federal Government in the              */
+/*  course of their official duties. Pursuant to title 17 Section 105         */
+/*  of the United States Code this software is not subject to                 */
+/*  copyright protection and is in the public domain. These programs          */
+/*  are experimental systems. NIST assumes no responsibility                  */
+/*  whatsoever for their use by other parties, and makes no                   */
+/*  guarantees, expressed or implied, about its quality, reliability,         */
+/*  or any other characteristic.  We would appreciate acknowledgment          */
+/*  if the software is used. This software can be redistributed and/or        */
+/*  modified freely provided that any derivative works bear some              */
+/*  notice that they are derived from it, and any modified versions           */
+/*  bear some notice that they have been modified.                            */
+/*                                                                            */
+/******************************************************************************/
 /* The functions in this file maintain:
  *   a stack of free vertex/edge structures,
  *   a stack of free polygon structures, and
@@ -19,16 +46,21 @@
 #include "types.h" 
 #include "view3d.h"
 #include "prtyp.h"
+#include "tmpstore.h"
 
 extern FILE *_ulog; /* log file */
 extern IX _maxNVT;  /* maximum number of temporary vertices */
 
 IX TransferVrt( VERTEX2D *toVrt, const VERTEX2D *fromVrt, IX nFromVrt );
 
-I1 *_memPoly=NULL; /* memory block for polygon descriptions; must start NULL */
+/* Both of the the block storage pointers should start as NULL */
+TMPSTORE *_memPoly = NULL; /* memory block for polygon descriptions */
+TMPSTORE *_memVertEdge = NULL; /* memory block for vertex/edge structures */
 HCVE *_nextFreeVE; /* pointer to next free vertex/edge */
 POLY *_nextFreePD; /* pointer to next free polygon descripton */
 POLY *_nextUsedPD; /* pointer to top-of-stack used polygon */
+IX _vertedgeCount = 0; /* count of total number vertex/edge structs requested */
+IX _polyCount = 0; /* count of total number polygons requested */
 R8 _epsDist;   /* minimum distance between vertices */
 R8 _epsArea;   /* minimum surface area */
 VERTEX2D *_leftVrt;  /* coordinates of vertices to left of edge */
@@ -96,8 +128,8 @@ IX PolygonOverlap( const POLY *p1, POLY *p2, const IX savePD, IX freeP2 )
 #endif
 
   pv1 = p1->firstVE;
-  do{  /*  process tempVrt against each edge of P1 (long loop) */
-       /*  transfer tempVrt into leftVrt and/or rightVrt  */
+  do {  /*  process tempVrt against each edge of P1 (long loop) */
+        /*  transfer tempVrt into leftVrt and/or rightVrt  */
     R8 a1, b1, c1; /* HC for current edge of P1 */
 //    IX u[MAXNVT];  /* +1 = vertex left of edge; -1 = vertex right of edge */
     IX left=1;     /* true if all vertices left of edge */
@@ -107,15 +139,21 @@ IX PolygonOverlap( const POLY *p1, POLY *p2, const IX savePD, IX freeP2 )
 #endif
  
         /* compute and save u[j] - relations of vertices to edge */
-    a1 = pv1->a; b1 = pv1->b; c1 = pv1->c;
+    a1 = pv1->a;
+    b1 = pv1->b;
+    c1 = pv1->c;
     pv1 = pv1->next;
     for( j=0; j<nTempVrt; j++ )
       {
       R8 dot = _tempVrt[j].x * a1 + _tempVrt[j].y * b1 + c1;
-      if( dot > _epsArea )
-        { _u[j] = 1; right = 0; }
-      else if( dot < -_epsArea )
-        { _u[j] = -1; left = 0; }
+      if(dot > _epsArea) {
+        _u[j] = 1;
+        right = 0;
+       }
+      else if( dot < -_epsArea ){
+        _u[j] = -1;
+        left = 0; 
+      }
       else
         _u[j] = 0;
 #if( DEBUG > 1 )
@@ -127,8 +165,12 @@ IX PolygonOverlap( const POLY *p1, POLY *p2, const IX savePD, IX freeP2 )
 #endif
  
         /* use quick tests to skip unnecessary calculations */
-    if( right ) continue;
-    if( left ) goto p2_outside_p1;
+    if(right) {
+      continue;
+    }
+    if(left) {
+      goto p2_outside_p1;
+    }
 
         /* check each vertex of tempVrt against current edge of P1 */
     jm1 = nTempVrt - 1;
@@ -177,7 +219,7 @@ IX PolygonOverlap( const POLY *p1, POLY *p2, const IX savePD, IX freeP2 )
     DumpP2D( "Right polygon:", nRightVrt, _rightVrt );
 #endif
 //    if( nLeftVrt >= _maxNVT || nRightVrt >= _maxNVT )
-//      errorf( 3, __FILE__, __LINE__, "Parameter _maxNVT too small", "" );
+//      errorf( 3, __FILE__, __LINE__, "Parameter _maxNVT too small");
     if( nLeftVrt >= _maxNVT )
       {
       error(2, __FILE__, __LINE__, 
@@ -254,7 +296,7 @@ p2_outside_p1:     /* no overlap between P1 and P2 */
       pp->area = p2->area;      /* copy P2 data */
       pp->trns = p2->trns;
       pv2 = p2->firstVE;
-      do{
+      do {
         if( pp->firstVE )
           pv = pv->next = GetVrtEdgeHC();
         else
@@ -272,9 +314,9 @@ p2_outside_p1:     /* no overlap between P1 and P2 */
     }
 
 finish:
-  if( freeP2 )   /* transfer P2 to free space */
+  if(freeP2) {  /* transfer P2 to free space */
     FreePolygons( p2, p2->next );
-
+  }
   return overlap;
 
   }  /* end of PolygonOverlap */
@@ -293,8 +335,8 @@ IX TransferVrt( VERTEX2D *toVrt, const VERTEX2D *fromVrt, IX nFromVrt )
 
   jm1 = nFromVrt - 1;
   for( n=j=0; j<nFromVrt; jm1=j++ )
-    if( fabs(fromVrt[j].x - fromVrt[jm1].x) > _epsDist ||
-        fabs(fromVrt[j].y - fromVrt[jm1].y) > _epsDist )
+    if(fabs(fromVrt[j].x - fromVrt[jm1].x) > _epsDist 
+       || fabs(fromVrt[j].y - fromVrt[jm1].y) > _epsDist)
       {               /* transfer to toVrt */
       toVrt[n].x = fromVrt[j].x;
       toVrt[n++].y = fromVrt[j].y;
@@ -385,18 +427,18 @@ POLY *GetPolygonHC( void )
   {
   POLY *pp;  /* pointer to polygon structure */
 
-  if( _nextFreePD )
-    {
+  if( _nextFreePD ) {
     pp = _nextFreePD;
     _nextFreePD = _nextFreePD->next;
     memset( pp, 0, sizeof(POLY) );  /* clear pointers */
-    }
-  else
-    pp = Alc_EC( &_memPoly, sizeof(POLY), __FILE__, __LINE__ );
-
+  } else {
+    _polyCount++;
+    pp = getMemory(_memPoly, __FILE__, __LINE__);
+    // pp = Alc_EC( &_memPoly, sizeof(POLY), __FILE__, __LINE__ );
+  }
   return pp;
 
-  }  /* end GetPolygonHC */
+}  /* end GetPolygonHC */
 
 /***  GetVrtEdgeHC.c  ********************************************************/
 
@@ -408,13 +450,14 @@ HCVE *GetVrtEdgeHC( void )
   {
   HCVE *pv;  /* pointer to vertex/edge structure */
 
-  if( _nextFreeVE )
-    {
+  if(_nextFreeVE) {
     pv = _nextFreeVE;
     _nextFreeVE = _nextFreeVE->next;
-    }
-  else
-    pv = Alc_EC( &_memPoly, sizeof(HCVE), __FILE__, __LINE__ );
+  } else {
+    _vertedgeCount++;
+    pv = getMemory(_memVertEdge, __FILE__, __LINE__);
+    //pv = Alc_EC( &_memPoly, sizeof(HCVE), __FILE__, __LINE__ );
+  }
 
   return pv;
 
@@ -440,11 +483,13 @@ void FreePolygons( POLY *first, POLY *last )
       error(3, __FILE__, __LINE__, "FirstVE not defined in FreePolygons");
 #endif
     pv = pp->firstVE->next;           /* free vertices (circular list) */
-    while( pv->next != pp->firstVE )  /* find "end" of vertex list */
+    while(pv->next != pp->firstVE)  /* find "end" of vertex list */
       pv = pv->next;
     pv->next = _nextFreeVE;           /* reset vertex links */
     _nextFreeVE = pp->firstVE;
-    if( pp->next == last ) break;
+    if(pp->next == last) {
+      break;
+    }
     }
   pp->next = _nextFreePD;       /* reset polygon links */
   _nextFreePD = first;
@@ -548,10 +593,18 @@ void InitTmpVertMem( void )
 
 void InitPolygonMem( const R8 epsdist, const R8 epsarea )
   {
-  if( _memPoly )  /* clear existing polygon structures data */
-    _memPoly = Clr_EC( _memPoly );
-  else            /* allocate polygon structures heap pointer */
-    _memPoly = Alc_ECI( 8000, __FILE__, __LINE__ );
+  if( _memPoly ) { /* clear existing polygon structures data */
+    //_memPoly = Clr_EC( _memPoly ); // This does not deallocate
+    cleanStore(_memPoly, __FILE__, __LINE__); // This actually deallocates
+  } else {  /* allocate polygon structures heap pointer */
+    //_memPoly = Alc_ECI( 8000, __FILE__, __LINE__ );
+    _memPoly = newStore(200, sizeof(POLY), __FILE__, __LINE__);
+  }
+  if(_memVertEdge) { /* clear existing vertex/edge structures data */
+    cleanStore(_memVertEdge, __FILE__, __LINE__);
+  } else { /* allocate vertex/edge structures heap pointer */
+    _memVertEdge = newStore(200, sizeof(HCVE), __FILE__, __LINE__);
+  }
 
   _epsDist = epsdist;
   _epsArea = epsarea;
@@ -571,8 +624,19 @@ void InitPolygonMem( const R8 epsdist, const R8 epsarea )
 
 void FreePolygonMem( void )
   {
-  if( _memPoly )
-    _memPoly = (I1 *)Fre_EC( _memPoly, __FILE__, __LINE__ );
+  if( _memPoly ){
+      summarizeStore(_ulog, _memPoly, "Polygon Memory");
+      deleteStore(_memPoly, __FILE__, __LINE__);
+      _memPoly = NULL;
+    }
+  if(_memVertEdge) {
+      summarizeStore(_ulog, _memVertEdge, "Vertex/Edge Memory");
+      deleteStore(_memVertEdge, __FILE__, __LINE__);
+      _memVertEdge = NULL;
+    }
+    //_memPoly = (I1 *)Fre_EC( _memPoly, __FILE__, __LINE__ );
+  _polyCount = 0;
+  _vertedgeCount = 0;
 
   }  /* end FreePolygonMem */
 
