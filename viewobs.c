@@ -530,23 +530,25 @@ IX Subsurface( SRFDAT3X *srf, SRFDAT3X sub[] )
         sub[j].nr = j;
         sub[j].nv = 3;
         SetCentroid( 3, sub[j].v, &sub[j].ctd );
-        sub[j].area = Triangle( sub[j].v+0, sub[j].v+1, sub[j].v+2, &tmpVrt, 0 );
+        sub[j].area = Triangle(sub[j].v+0, sub[j].v+1, sub[j].v+2, &tmpVrt, 0);
         memcpy( &sub[j].dc, &srf->dc, sizeof(DIRCOS) );
         }
     }
-  else if( srf->nv==5 )
+  else if(srf->nv==5)
     {
-    for( j=0,i=1; j<5; j++,i++ )
+    for(j=0,i=1; j<5; j++,i++)
       {
-      if( i==5 ) i = 0;
+      if(i==5) {
+        i = 0;
+      }
       VCOPY( (&srf->ctd), (sub[j].v+0) );
       VCOPY(  (srf->v+j), (sub[j].v+1) );
       VCOPY(  (srf->v+i), (sub[j].v+2) );
       sub[j].nr = j;
       sub[j].nv = 3;
       SetCentroid( 3, sub[j].v, &sub[j].ctd );
-      sub[j].area = Triangle( sub[j].v+0, sub[j].v+1, sub[j].v+2, &tmpVrt, 0 );
-      memcpy( &sub[j].dc, &srf->dc, sizeof(DIRCOS) );
+      sub[j].area = Triangle(sub[j].v+0, sub[j].v+1, sub[j].v+2, &tmpVrt, 0);
+      memcpy(&sub[j].dc, &srf->dc, sizeof(DIRCOS));
       }
     nSubSrf = 5;
     }

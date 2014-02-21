@@ -26,7 +26,7 @@ The program is written in portable C, and thus should compile on most systems wi
 1. Download it and unpack it
 2. Open a command prompt or terminal window, change directories to where you put the source, and run
     * `make` to compile with GCC
-    * `nmake` to compile with the Visual Studio compiler
+    * `nmake /F Makefile.windows` to compile with the Visual Studio compiler
 
 That's it. Standard caveats with respect to paths apply.
 

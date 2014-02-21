@@ -1,7 +1,8 @@
 #
 #  A Simple Makefile for View3D
 #
-CC=gcc
+CC    = gcc
+RM    = rm -f
 CFLAGS= -Wunused
 #
 obj   = ctrans.o \
@@ -37,4 +38,4 @@ $(progs): $(obj)
 	$(CC) $(CFLAGS) -o $@ $*.c $(obj) -lm
 #
 clean:
-	rm -f $(progs) $(obj)
+	$(RM) $(progs) $(obj)

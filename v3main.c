@@ -115,8 +115,8 @@ IX main( IX argc, I1 **argv )
       return EXIT_FAILURE;
     }
   /* open log file */
-  //_ulog = fopen( "View3D.log", "w" );
-  _ulog = stdout;
+  _ulog = fopen( "View3D.log", "w" );
+  //_ulog = stdout;
   if(!_ulog)
     error(3, __FILE__, __LINE__, "Failed to open VIEW3D.LOG");
 
