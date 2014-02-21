@@ -3,33 +3,43 @@ View3D
 
 View3D is a C program for the computation of geometric view factors.
 
-This is a slightly modified version of View3D 3.3, which was the last version actively developed by the original author. I am calling this version 3.3.1.  As with the original code, this version is in the public domain, and is made available without any warranty:
+This is View3D 4.0, a C language program for the calculation of geometric view factors. It utilizes a number of integration techniques to compute view factors between planar triangles or quadrilaterals in three dimensions. The original version of this program was developed at the National Institute of Standards and Technology by George Walton and was in the public domain. This version is released subject to the terms of the GNU GPL and is not in the public domain. Any files that have not been substantially modified are labeled as such and include the original NIST disclaimer. 
 
-> This software was developed at the National Institute of Standards
-> and Technology by employees of the Federal Government in the course
-> of their official duties.  Pursuant to title 17 Section 105 of the
-> United States Code this software is not subject to copyright
-> protection and is in the public domain. These programs are
-> experimental systems. NIST assumes no responsibility whatsoever for
-> their use by other parties, and makes no guarantees, expressed or
-> implied, about its quality, reliability, or any other
-> characteristic.  We would appreciate acknowledgement if the software
-> is used. This software can be redistributed and/or modified freely
-> provided that any derivative works bear some notice that they are
-> derived from it, and any modified versions bear some notice that
-> they have been modified.
+Documentation
+-------------
 
-Only two changes to the program have been made to compile with GCC (on platforms other than Windows):
+This version is not intended to behave differently than versions 3.2 or 3.3.1. The documentation for those programs is avialable from a number of sources:
 
-1. The inclusion of conio.h in misc.c has been moved inside the #if statement so that it is not included for GCC.
+* Version 3.2 has been included with the US Department of Energy's EnergyPlus for some time. To install the program and documentation, during the main EnergyPlus installation select the optional view factor installation. EnergyPlus is available at www.energyplus.gov.
+* Documentation for version 3.3.1 is available here: www.personal.psu.edu/jwd131/software/v3d33/manual/view3d33manual.html.
 
-2. A #define macro (named STRCMPI) is used to switch between strcmpi and strcasecmp depending upon the compiler.
+Installation
+------------
 
-It is likely (though I haven't tried it) that these modifications will not be sufficient to compile the code with the MINGW compiler(s).  The only other issue that I know of is that on Windows XP it will crash (or fail) in certain situations, particularly with larger input files. This appears to be a memory problem (probably in the temporary polygon
-memory setup), and disabling optimization sometimes helps.
+View3D is a stand-alone executable. No installation is necessary.
 
-Build files for make (one for Windows system and one for non-Windows systems) and scons are included.  Your mileage may vary.
+Building the Program
+--------------------
 
+The program is written in portable C, and thus should compile on most systems with a C compiler. No features from newer C standards are used. Makefiles for GCC and the Visual Studio compiler are included. Presently, most development work is done on Windows with the MinGW (32 bit) compilers. To build the program
+
+1. Download it and unpack it
+2. Open a command prompt or terminal window, change directories to where you put the source, and run
+    * `make` to compile with GCC
+    * `nmake` to compile with the Visual Studio compiler
+
+That's it. Standard caveats with respect to paths apply.
+
+Running the Program
+-------------------
+
+The program is run from the command line:
+
+    View3D inputfile.vs3 outputfile
+
+This will produce an two files in the current directory: `outputfile` and `View3D.log`.
+
+-- 
 Jason DeGraw
 
-April 26, 2011
+February 21, 2014
