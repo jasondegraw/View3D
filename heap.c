@@ -383,7 +383,7 @@ void MemRem( I1 *msg )
 
   }  /* end of MemRem */
 
-#define ANSIOFFSET 0 // 1 = include V[0] in vector allocation
+#define ANSIOFFSET 1 // 1 = include V[0] in vector allocation
 
 /***  Alc_V.c  ***************************************************************/
 

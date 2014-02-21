@@ -750,11 +750,14 @@ void TestSubSrf( SRFDAT3D *srf, const IX *baseSrf, VFCTRL *vfCtrl )
                                 /* test for co-planar surfaces */
     eps = 1.0e-5f * srf[n].rc;
     infront = behind = 0;
-    for( j=0; j<srf[n].nv; j++ )
+    for(j=0; j<srf[n].nv; j++)
       {
       dot = VDOTW( (srf[n].v[j]), (&srf[m].dc) );
-      if( dot > eps ) infront = 1;
-      if( dot < -eps ) behind = 1;
+      if(dot > eps) {
+        infront = 1;
+      } else if(dot < -eps) {
+        behind = 1;
+      }
       }
     if(infront || behind)
       {
