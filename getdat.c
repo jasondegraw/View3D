@@ -292,7 +292,7 @@ finish:
   if( vfCtrl->col > vfCtrl->nRadSrf )
      error(2, __FILE__, __LINE__,"\"row\" value too large");
 
-  if( error( -1, __FILE__, __LINE__, "" )>0 )
+  if(error(-1, __FILE__, __LINE__)>0 )
     error(3, __FILE__, __LINE__, "Fix errors in input data");
 
   }  /*  end of CountVS3D  */
