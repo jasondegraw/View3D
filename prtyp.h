@@ -30,6 +30,7 @@
 
 #define PROGRAMSTR "View3D"
 #define VERSIONSTR "4.0.0"
+#define DEBUGX
 
 /*  Common Function Prototypes  */
 

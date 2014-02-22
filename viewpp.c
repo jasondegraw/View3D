@@ -251,49 +251,47 @@ void IntFac( const IX nSrf, const R4 *emit, const R4 *area, R8 **AF )
  *  area; surface areas
  *  AF;   radiation interchange factors [triangular]
  */
-  {
+{
   IX  m, n;
-  R8 *a, *w;
-  FILE *tmpf=tmpfile();
+  R8 *a, *w, *W;
 
   a = Alc_V( 1, nSrf, sizeof(R8), __FILE__, __LINE__ );
-  w = Alc_V( 1, nSrf, sizeof(R8), __FILE__, __LINE__ );
+  W = Alc_V(0, nSrf*nSrf, sizeof(R8), __FILE__, __LINE__);
 
-/* subtract AREA/RHO from diagonal elements */
-  for( n=1; n<=nSrf; n++ )
-    {
+  /* subtract AREA/RHO from diagonal elements */
+  for(n=1; n<=nSrf; n++) {
     a[n] = area[n] / (1.0 - emit[n]);
     AF[n][n] -= a[n];
     a[n] *= emit[n];
-    }
+  }
 
-  LUFactorSymm( nSrf, AF );  /* factor AF (symmetric) */
+  LUFactorSymm(nSrf, AF);  /* factor AF (symmetric) */
   
-  for( n=1; n<=nSrf; n++ )  /* determine response vectors */
-    {
-    memset( w+1, 0, nSrf*sizeof(R8) );
+  w = W-1; /* This will get the indexing to work */
+  for(n=1; n<=nSrf; n++)  /* determine response vectors */
+  {
     w[n] = -a[n];
     LUSolveSymm( nSrf, AF, w );
-    fwrite( w+1, sizeof(R8), nSrf, tmpf );
-    }
+    w += nSrf;
+  }
   
-  fflush( tmpf );
-  rewind( tmpf );
-  for( n=1; n<=nSrf; n++ )    /* compute total interchange areas */
-    {
-    m = fread( w+1, sizeof(R8), nSrf, tmpf );
-    for( m=1; m<n; m++ )
+  w = W-1; /* This will get the indexing to work */
+  /* Compute total interchange areas */
+  for(n=1; n<=nSrf; n++) {
+    for(m=1; m<n; m++) {
       AF[n][m] = a[m] * w[m];
-    AF[n][n] = a[n] * (w[n] - emit[n]);
-    for( m=n+1; m<=nSrf; m++ )
-      AF[m][n] = 0.5 * ( AF[m][n] + a[m] * w[m] );
     }
+    AF[n][n] = a[n] * (w[n] - emit[n]);
+    for(m=n+1; m<=nSrf; m++) {
+      AF[m][n] = 0.5 * (AF[m][n] + a[m] * w[m]);
+    }
+    w += nSrf;
+  }
 
-  Fre_V( a, 1, nSrf, sizeof(R8), __FILE__, __LINE__ );
-  Fre_V( w, 1, nSrf, sizeof(R8), __FILE__, __LINE__ );
-  fclose( tmpf );
+  Fre_V(a, 1, nSrf, sizeof(R8), __FILE__, __LINE__);
+  Fre_V(W, 0, nSrf*nSrf, sizeof(R8), __FILE__, __LINE__);
 
-  }  /* end of IntFac */
+}  /* end of IntFac */
 
 /*  LUFactorSymm.c  **********************************************************/
 

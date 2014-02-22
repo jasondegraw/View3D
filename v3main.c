@@ -128,7 +128,7 @@ IX main( IX argc, I1 **argv )
     error(3, __FILE__, __LINE__, "Cannot open \"%s\" for output", outFile);
 
   fprintf(_ulog, "  Program:  %s\n", argv[0] );
-#ifdef _DEBUG
+#ifdef DEBUGX
   fprintf(_ulog, "  Version:  %s DEBUG\n", VERSIONSTR );
 #else
   fprintf(_ulog, "  Version:  %s\n", VERSIONSTR);
@@ -149,7 +149,7 @@ IX main( IX argc, I1 **argv )
 #endif
 #endif
 
-#if( DEBUG > 0 )
+#ifdef DEBUGX
   _echo = 1;
 #endif
 
@@ -481,20 +481,23 @@ IX main( IX argc, I1 **argv )
   fputs( _string, stderr );
   fputs( _string, _ulog );
 
-  if( vfCtrl.emittances )
-    {
-    fprintf( stderr, "\nProcessing surface emissivites\n" );
-    time1 = CPUtime( 0.0 );
-    IntFac( nSrf, emit, area, AF );
-    sprintf( _string, "%7.2f seconds to include emissivities.\n", CPUtime(time1) );
-    fputs( _string, stderr );
-    fputs( _string, _ulog );
-    if( _list>1 )
-      ReportAF( nSrf, encl, "View factors including emissivities:",
-        name, area, emit, base, AF, 0 );
-    if( encl )
-      NormAF( nSrf, emit, area, AF, 1.0e-7f, 30 );   /* fix rounding errors */
+  if(vfCtrl.emittances) {
+    fprintf(stderr, "\nProcessing surface emissivites\n");
+    time1 = CPUtime(0.0);
+    IntFac(nSrf, emit, area, AF);
+    sprintf(_string, "%7.2f seconds to include emissivities.\n", CPUtime(time1));
+    fputs(_string, stderr);
+    fputs(_string, _ulog);
+    if(_list>1) {
+      ReportAF(nSrf, encl, "View factors including emissivities:", name, area, emit, base, AF, 0);
     }
+    if(encl) {
+      NormAF(nSrf, emit, area, AF, 1.0e-7f, 30);   /* fix rounding errors */
+      if(_list>1) {
+        ReportAF(nSrf, encl, "View factors accounting for enclosure:", name, area, emit, base, AF, 0);
+      }
+    }
+  }
 
   fprintf( _ulog, "\nFinal view factors:" );
   if( vfCtrl.emittances )
@@ -509,10 +512,9 @@ IX main( IX argc, I1 **argv )
   fputs( _string, stderr );
   fputs( _string, _ulog );
 
-
+#ifdef DEBUGX
   fprintf( _ulog, "\nFinal list of surfaces:\n" );
   fprintf( _ulog, "   #        name     area  emit\n" );
-#ifdef XXX
   for( n=1; n<=nSrf; n++ )
     fprintf( _ulog, "%4d %12s %8.3f %5.3f\n", n, name[n], area[n], emit[n] );
 #endif
@@ -598,7 +600,7 @@ void ReportAF(const IX nSrf, const IX encl, const I1 *title, I1 ** name,
     sumF /= area[n];
     if( _list>0 )
       {
-      fprintf( _ulog, " Row:  %4d %12s %9.6f", n, name[n], sumF );
+      fprintf( _ulog, " Row:  %6d, Name: %s, sum of view factors: %9.6f", n, name[n], sumF );
       if( encl )
         fprintf( _ulog, " (%.6f)", fabs( sumF - emit[n] ) );
       fputc( '\n', _ulog );

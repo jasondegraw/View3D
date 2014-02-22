@@ -361,8 +361,6 @@ void View3D( SRFDAT3D *srf, const IX *base, IX *possibleObstr,
       else
         if( AF[n][m] < 1.0e-12 * srf[m].area )
           AF[n][m] = 0.0;
-#ifdef XXX
-#endif
 
       if( _list>0 && vfCtrl->row )
         {
@@ -413,7 +411,7 @@ void View3D( SRFDAT3D *srf, const IX *base, IX *possibleObstr,
   if( vfCtrl->failConverge ) error( 1, __FILE__, __LINE__,
     "Some calculations did not converge, see VIEW3D.LOG", "" );
 
-#if( DEBUG > 1 )
+#ifdef DEBUGX
   MemRem( "After View3D() calculations" );
 #endif
   if( vfCtrl->nMaskSrf )
@@ -448,7 +446,7 @@ IX ProjectionDirection( SRFDAT3D *srf, SRFDATNM *srfN, SRFDATNM *srfM,
   R8 sdtoN, sdtoM; /* minimum distances from obstruction to N and M */
   IX direction=0;  /* 1 = N is surface 1; -1 = M is surface 1 */
 
-#if( DEBUG > 1 )
+#ifdef DEBUGX
   fprintf( _ulog, "ProjectionDirection:\n");
 #endif
 
@@ -490,7 +488,7 @@ IX ProjectionDirection( SRFDAT3D *srf, SRFDATNM *srfN, SRFDATNM *srfM,
       }
     sdtoN = sqrt( sdtoN );
     sdtoM = sqrt( sdtoM );
-#if( DEBUG > 1 )
+#ifdef DEBUGX
     fprintf( _ulog, " min dist to srf %d: %e\n", srfN->nr, sdtoN );
     fprintf( _ulog, " min dist to srf %d: %e\n", srfM->nr, sdtoM );
 #endif
@@ -502,7 +500,7 @@ IX ProjectionDirection( SRFDAT3D *srf, SRFDATNM *srfN, SRFDATNM *srfM,
       if( sdtoN > sdtoM ) direction = 1;
       }
 
-#if( DEBUG > 1 )
+#ifdef DEBUGX
     fprintf( _ulog, " sdtoN %e, sdtoM %e, dir %d\n",
       sdtoN, sdtoM, direction );
 #endif
@@ -523,7 +521,7 @@ IX ProjectionDirection( SRFDAT3D *srf, SRFDATNM *srfN, SRFDATNM *srfM,
       direction = -1;
     }
 
-#if( DEBUG > 1 )
+#ifdef DEBUGX
   fprintf( _ulog, " rcN %e, rcM %e, dir %d, pdir %d\n",
     srfN->rc, srfM->rc, direction, vfCtrl->prjReverse );
 #endif
