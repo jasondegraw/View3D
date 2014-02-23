@@ -28,24 +28,23 @@ TMPSTORE *newStore(size_t count, size_t size, I1 *file, IX line)
 {
   TMPSTORE *s;
   s = (TMPSTORE*) Alc_E(sizeof(TMPSTORE), file, line);
-  if(s == NULL)
+  if(s == NULL) {
     return NULL;
+  }
   s->size = size;
   s->Nmax = count;
   s->n = s->nblock = 0;
   s->first = s->last = (TMPBLOCK*) Alc_E(sizeof(TMPBLOCK), file, line);
-  if(s->first == NULL)
-    {
-      Fre_E(s, sizeof(TMPSTORE), file, line);
-      return NULL;
-    }
+  if(s->first == NULL) {
+    Fre_E(s, sizeof(TMPSTORE), file, line);
+    return NULL;
+  }
   s->first->memory = (I1*) Alc_E(count * size, file, line);
-  if(s->first->memory == NULL)
-    {
-      Fre_E(s->first, sizeof(TMPBLOCK), file, line);
-      Fre_E(s, sizeof(TMPSTORE), file, line);
-      return NULL;
-    }
+  if(s->first->memory == NULL) {
+    Fre_E(s->first, sizeof(TMPBLOCK), file, line);
+    Fre_E(s, sizeof(TMPSTORE), file, line);
+    return NULL;
+  }
   s->first->next = NULL;
   s->nblock++;
   return s;
@@ -54,18 +53,19 @@ TMPSTORE *newStore(size_t count, size_t size, I1 *file, IX line)
 void *getMemory(TMPSTORE *s, I1 *file, IX line)
 {
   TMPBLOCK *next = NULL;
-  if(s->n < s->Nmax)
+  if(s->n < s->Nmax) {
     return (void*) (s->last->memory + s->size * s->n++);
+  }
   s->n = 1;
   next = (TMPBLOCK*) Alc_E(sizeof(TMPBLOCK), file, line);
-  if(next == NULL)
+  if(next == NULL) {
     return 0;
+  }
   next->memory = (I1*) Alc_E(s->Nmax * s->size, file, line);
-  if(next->memory == NULL)
-    {
-      Fre_E(next, sizeof(TMPBLOCK), file, line);
-      return NULL;
-    }
+  if(next->memory == NULL) {
+    Fre_E(next, sizeof(TMPBLOCK), file, line);
+    return NULL;
+  }
   s->last->next = next;
   s->last = next;
   s->last->next = NULL;
@@ -77,13 +77,12 @@ void cleanStore(TMPSTORE *s, I1 *file, IX line)
 {
   TMPBLOCK *next = s->first->next;
   s->first->next = NULL;
-  while(next != NULL)
-    {
-      s->last = next->next;
-      Fre_E(next->memory, s->Nmax * s->size, file, line);
-      Fre_E(next, sizeof(TMPBLOCK), file, line);
-      next = s->last;
-    }
+  while(next != NULL) {
+    s->last = next->next;
+    Fre_E(next->memory, s->Nmax * s->size, file, line);
+    Fre_E(next, sizeof(TMPBLOCK), file, line);
+    next = s->last;
+  }
   s->last = s->first;
   memset(s->first->memory, 0, s->Nmax * s->size);
   s->nblock = 1;
@@ -102,20 +101,21 @@ void deleteStore(TMPSTORE *s, I1 *file, IX line)
 
 void summarizeStore(FILE *fp, TMPSTORE *s, I1 *name)
 {
-  if(name)
+  if(name) {
     fprintf(fp,"%s Store Summary:\n",name);
-  else
+  } else {
     fprintf(fp,"Store Summary:\n");
+  }
   fprintf(fp,"\tStructure size: %d\n", s->size);
   fprintf(fp,"\tStructures per block: %d\n", s->Nmax);
   fprintf(fp,"\tNumber of blocks: %d\n", s->nblock);
   fprintf(fp,"\tTotal number of structures allocated: %d\n",
-      s->Nmax * s->nblock);
+          s->Nmax * s->nblock);
   fprintf(fp,"\tTotal size of of structures allocated: %d\n",
-      s->Nmax * s->nblock * s->size);
+          s->Nmax * s->nblock * s->size);
   fprintf(fp,"\tTotal number of structures returned: %d\n",
-      s->Nmax * (s->nblock - 1) + s->n);
+          s->Nmax * (s->nblock - 1) + s->n);
   fprintf(fp,"\tTotal size of structures returned: %d\n",
-      (s->Nmax * (s->nblock - 1) + s->n) * s->size);
+          (s->Nmax * (s->nblock - 1) + s->n) * s->size);
   return;
 }
