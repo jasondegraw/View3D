@@ -72,15 +72,15 @@ IX error(IX severity, I1 *file, IX line, ...)
     va_end(args);
     if(severity > 2) {
       exit(EXIT_FAILURE);
-     }
-      //fputs("\n", stderr);
+    }
+    //fputs("\n", stderr);
     fputs("\n", _ulog);
   }
-  else if( severity < -1 ) {   /* clear error count */
+  else if(severity < -1) {   /* clear error count */
     count = 0;
   }
   return count;
-  }  /*  end error  */
+}  /*  end error  */
 
 #include <limits.h> /* define: SHRT_MAX, SHRT_MIN */
 
@@ -91,8 +91,8 @@ IX error(IX severity, I1 *file, IX line, ...)
  *  Global errno will indicate overflow.
  *  Used in place of atol() because of error processing.  */
 
-IX LongCon( I1 *str, I4 *i )
-  {
+IX LongCon(I1 *str, I4 *i)
+{
   I1 *endptr;
   I4 value;
   IX eflag=0;
@@ -102,20 +102,24 @@ IX LongCon( I1 *str, I4 *i )
 #endif
 
   endptr = str;
-  value = strtol( str, &endptr, 0 );
-  if( *endptr )
+  value = strtol(str, &endptr, 0);
+  if(*endptr) {
     eflag = 1;
+  }
 #if( !__GNUC__)
-  if( errno ) eflag = 1;
+  if(errno) {
+    eflag = 1;
+  }
 #endif
 
-  if( eflag )
+  if(eflag) {
     *i = 0L;
-  else
+  } else {
     *i = value;
+  }
   return eflag;
   
-  }  /* end of LongCon */
+}  /* end of LongCon */
 
 /***  IntCon.c  **************************************************************/
 
@@ -124,8 +128,8 @@ IX LongCon( I1 *str, I4 *i )
  *  Short integers are in the range -32767 to +32767 (INT_MIN to INT_MAX).
  *  Used in place of atoi() because of error processing.  */
 
-IX IntCon( I1 *str, IX *i )
-  {
+IX IntCon(I1 *str, IX *i)
+{
   I4 value;    /* compute result in long integer, then chop */
   IX eflag=0;
 
@@ -146,7 +150,7 @@ IX IntCon( I1 *str, IX *i )
   }
   return eflag;
   
-  }  /* end of IntCon */
+}  /* end of IntCon */
 
 extern FILE *_unxt;   /* NXT input file */
 extern IX _echo;      /* if true, echo NXT input file */
@@ -156,67 +160,74 @@ I1 *_nxtbuf;   /* large buffer for NXT input file */
 
 /*  Open file_name as UNXT file.  */
 
-void NxtOpen( I1 *file_name, I1 *file, IX line )
+void NxtOpen(I1 *file_name, I1 *file, IX line)
 /* file;  source code file name: __FILE__
  * line;  line number: __LINE__ */
-  {
-  if( _unxt )
-    error( 3, file, line, "_UNXT already open");
-  _unxt = fopen( file_name, "r" );  /* = NULL if no file */
-  if( !_unxt )
+{
+  if(_unxt) {
+    error(3, file, line, "_UNXT already open");
+  }
+  _unxt = fopen(file_name, "r");  /* = NULL if no file */
+  if(!_unxt) {
     error(3, file, line, "Could not open file: %s", file_name);
-  }  /* end NxtOpen */
+  }
+}  /* end NxtOpen */
 
 /***  NxtClose  ***************************************************************/
 
 /*  Close _unxt.  */
 
-void NxtClose( void )
-  {
-  if( _unxt )
-    {
-    if( fclose( _unxt ) )
+void NxtClose(void)
+{
+  if(_unxt) {
+    if(fclose(_unxt)) {
       error(2, __FILE__, __LINE__, "Problem while closing _UNXT");
-    _unxt = NULL;
     }
+    _unxt = NULL;
+  }
 
-  }  /* end NxtClose */
+}  /* end NxtClose */
 
 /***  NxtLine  ****************************************************************/
 
 /*  Get characters to end of line (\n --> \0); used by NxtWord().  */
 
-I1 *NxtLine( I1 *str, IX maxlen )
-  {
+I1 *NxtLine(I1 *str, IX maxlen)
+{
   IX c=0;       /* character read from _unxt */
   IX i=0;       /* current position in str */
 
-  while( c!='\n' )
-    {
-    c = getc( _unxt );
-    if( c==EOF )
+  while(c!='\n')
+  {
+    c = getc(_unxt);
+    if(c==EOF) {
       return NULL;
-    if( _echo )
-      putc( c, _ulog );
-    if( maxlen < 1 )
+    }
+    if(_echo) {
+      putc(c, _ulog);
+    }
+    if(maxlen < 1) {
       continue;   // do not fill buffer
-    if( c == '\r' )
+    }
+    if(c == '\r') {
       continue;    // 2007/10/07 Linux EOL = \n\r
+    }
     str[i++] = (I1)c;
-    if( i == maxlen )
-      {
+    if(i == maxlen)
+    {
       str[i-1] = '\0';
       error(3, __FILE__, __LINE__, "Buffer overflow: %s", str);
-      }
     }
-  if( i )
+  }
+  if(i) {
     str[i-1] = '\0';
-  else
+  } else {
     str[0] = '\0';
+  }
 
   return str;
 
-  }  /* end NxtLine */
+}  /* end NxtLine */
 
 /***  NxtWord  ****************************************************************/
 
@@ -230,7 +241,7 @@ I1 *NxtLine( I1 *str, IX maxlen )
  *  which may also be end-of-line (EOL) character.
  *  Initialization with flag = -1 in now invalid - debug checked. */
 
-I1 *NxtWord( I1 *str, IX flag, IX maxlen )
+I1 *NxtWord(I1 *str, IX flag, IX maxlen)
 /* str;   buffer where word is stored; return pointer.
  * flag:  0:  get next word from current position in _unxt;
           1:  get 1st word from next line of _unxt;
@@ -238,171 +249,177 @@ I1 *NxtWord( I1 *str, IX flag, IX maxlen )
           3:  get next data line from _unxt (\n --> \0);
           4:  get next line (even if comment) (\n --> \0).
  * maxlen: length of buffer to test for overflow. */
-  {
+{
   IX c;         // character read from _unxt
   IX i=0;       // current position in str
   IX done=0;    // true when start of word is found or word is complete
 
-#ifdef _DEBUG
-  if( !_unxt )
-    error( 3, __FILE__, __LINE__, "_UNXT not open" );
-  if( maxlen < 16 )
-    error( 3, __FILE__, __LINE__, "Invalid maxlen: %d", maxlen );
+#ifdef DEBUGX
+  if(!_unxt) {
+    error(3, __FILE__, __LINE__, "_UNXT not open");
+  }
+  if(maxlen < 16) {
+    error(3, __FILE__, __LINE__, "Invalid maxlen: %d", maxlen);
+  }
 #endif
-  c = getc( _unxt );
-  if( flag > 0 )
-    {
-    if( c != '\n' )  // last call did not end at EOL; ready to read next char.
-      {                // would miss first char if reading first line of file.
-      if( flag == 2 )
-        NxtLine( str, maxlen );  // read to EOL filling buffer
-      else
-        NxtLine( str, 0 );  // skip to EOL
-        // if flag = 1; continue to read first word on next line
+  c = getc(_unxt);
+  if(flag > 0) {
+    if(c != '\n') {  // last call did not end at EOL; ready to read next char.
+                     // would miss first char if reading first line of file.
+      if(flag == 2) {
+        NxtLine(str, maxlen);  // read to EOL filling buffer
+      } else {
+        NxtLine(str, 0);  // skip to EOL
       }
-    if( flag > 1 )
-      {
-        // if flag = 2; return (partial?) line just read
-      if( flag > 2 )
-        {
+      // if flag = 1; continue to read first word on next line
+    }
+    if(flag > 1) {
+      // if flag = 2; return (partial?) line just read
+      if(flag > 2) {
         // if flag > 2; return all of next line (must fit in buffer)
-        NxtLine( str, maxlen );
-        if( flag == 3 )  // skip comment lines
-          while( str[0] == '!' )
-            NxtLine( str, maxlen );
-#ifdef _DEBUG
-        if( flag > 4 )
-          error( 3, __FILE__, __LINE__, "Invalid flag: %d", flag );
-#endif
+        NxtLine(str, maxlen);
+        if(flag == 3) { // skip comment lines
+          while(str[0] == '!') {
+            NxtLine(str, maxlen);
+          }
         }
-      ungetc( '\n', _unxt );  // restore EOL character for next call
-      return str;
-      }
-    }
-  else
-    {
-#ifdef _DEBUG
-    if( flag < 0 )
-      error( 3, __FILE__, __LINE__, "Invalid flag: %d", flag);
+#ifdef DEBUGX
+        if(flag > 4) {
+          error(3, __FILE__, __LINE__, "Invalid flag: %d", flag);
+        }
 #endif
-    if( c == ' ' || c == ',' || c == '\n' || c == '\t' )
-      ; // skip EOW char saved at last call
-    else
-      ungetc( c, _unxt );  // restore first char of first line
-    }
-
-  while( !done )   // search for start of next word
-    {
-    c = getc( _unxt );
-    if(c==EOF)
-      return NULL;
-    if(_echo)
-      putc(c, _ulog);
-    switch(c)
-      {
-      case ' ':          // skip word separators
-      case ',':
-      case '\n':
-      case '\r':
-      case '\t':
-      case '\0':
-        break;
-      case '!':          // begin comment; skip to EOL
-        NxtLine( str, 0 );
-        break;
-      case '*':          // end-of-file indicator
-        NxtClose();
-        return NULL;
-      default:           // first character of word found
-        str[i++] = (I1)c;
-        done = 1;
-        break;
       }
-    }  // end start-of-word search
+      ungetc('\n', _unxt);  // restore EOL character for next call
+      return str;
+    }
+  }
+  else
+  {
+#ifdef DEBUGX
+    if(flag < 0) {
+      error(3, __FILE__, __LINE__, "Invalid flag: %d", flag);
+    }
+#endif
+    if(c == ' ' || c == ',' || c == '\n' || c == '\t') {
+      ; // skip EOW char saved at last call
+    } else {
+      ungetc(c, _unxt);  // restore first char of first line
+    }
+  }
+
+  while(!done) {  // search for start of next word
+    c = getc(_unxt);
+    if(c==EOF) {
+      return NULL;
+    }
+    if(_echo) {
+      putc(c, _ulog);
+    }
+    switch(c) {
+    case ' ':          // skip word separators
+    case ',':
+    case '\n':
+    case '\r':
+    case '\t':
+    case '\0':
+      break;
+    case '!':          // begin comment; skip to EOL
+      NxtLine(str, 0);
+      break;
+    case '*':          // end-of-file indicator
+      NxtClose();
+      return NULL;
+    default:           // first character of word found
+      str[i++] = (I1)c;
+      done = 1;
+      break;
+    }
+  }  // end start-of-word search
 
   done = 0;
-  while(!done)   // search for end-of-word (EOW)
-    {
+  while(!done) {  // search for end-of-word (EOW)
     c = getc(_unxt);
-    if(c==EOF)
+    if(c==EOF) {
       return NULL;
-    if(_echo)
+    }
+    if(_echo) {
       putc(c, _ulog);
-    switch(c)
-      {
-      case '\n':   // EOW characters
-      case ' ':
-      case ',':
-      case '\t':
-        str[i] = '\0';
-        done = 1;
-        break;
-      case '\r':   // 2004/01/14 here for Linux: EOL = \n\r
-      case '\0':
-        break;
-      default:     // accumulate word in buffer
-        str[i++] = (I1)c;
-        if(i == maxlen)  // with overflow test
-          {
-          str[i-1] = '\0';
-          error(3, __FILE__, __LINE__, "Buffer overflow: %s", str);
-          }
-        break;
+    }
+    switch(c) {
+    case '\n':   // EOW characters
+    case ' ':
+    case ',':
+    case '\t':
+      str[i] = '\0';
+      done = 1;
+      break;
+    case '\r':   // 2004/01/14 here for Linux: EOL = \n\r
+    case '\0':
+      break;
+    default:     // accumulate word in buffer
+      str[i++] = (I1)c;
+      if(i == maxlen) { // with overflow test
+        str[i-1] = '\0';
+        error(3, __FILE__, __LINE__, "Buffer overflow: %s", str);
       }
-    }  // end EOW search
-  ungetc( c, _unxt ); // save EOW character for next call
+      break;
+    }
+  }  // end EOW search
+  ungetc(c, _unxt); // save EOW character for next call
 
   return str;
 
-  }  /* end NxtWord */
+}  /* end NxtWord */
 
 #include <float.h>  /* define: FLT_MAX, FLT_MIN */
 
 /***  ReadR8  *****************************************************************/
 
-R8 ReadR8( IX flag )
-  {
+R8 ReadR8(IX flag)
+{
   R8 value;
 
-  NxtWord( _string, flag, sizeof(_string) );
-  if( DblCon( _string, &value ) )
+  NxtWord(_string, flag, sizeof(_string));
+  if(DblCon(_string, &value)) {
     error(2, __FILE__, __LINE__, "%s is not a (valid) number", _string);
+  }
   return value;
 
-  }  /* end ReadR8 */
+}  /* end ReadR8 */
 
 /***  ReadR4  *****************************************************************/
 
 /*  Convert next word from file _unxt to R4 real. */
 
-R4 ReadR4( IX flag )
-  {
+R4 ReadR4(IX flag)
+{
   R8 value;
 
-  NxtWord( _string, flag, sizeof(_string) );
-  if( DblCon( _string, &value ) || value > FLT_MAX || value < -FLT_MAX )
+  NxtWord(_string, flag, sizeof(_string));
+  if(DblCon(_string, &value) || value > FLT_MAX || value < -FLT_MAX) {
     error(2, __FILE__, __LINE__, "Bad float value: %s", _string);
+  }
 
   return (R4)value;
 
-  }  /* end ReadR4 */
+}  /* end ReadR4 */
 
 /***  ReadIX  *****************************************************************/
 
 /*  Convert next word from file _unxt to IX integer. */
 
-IX ReadIX( IX flag )
-  {
+IX ReadIX(IX flag)
+{
   I4 value;
 
-  NxtWord( _string, flag, sizeof(_string) );
-  if( LongCon( _string, &value ) 
-     || value > INT_MAX || value < INT_MIN )  // max/min depends on compiler
+  NxtWord(_string, flag, sizeof(_string));
+  if(LongCon(_string, &value) || value > INT_MAX || value < INT_MIN) { // max/min depends on compiler
     error(2, __FILE__, __LINE__, "Bad integer: %s", _string);
+  }
 
   return (IX)value;
 
-  }  /* end ReadIX */
+}  /* end ReadIX */
 
 /***  DblCon  *****************************************************************/
 
@@ -411,8 +428,8 @@ IX ReadIX( IX flag )
  *  Global errno will indicate overflow.
  *  Used in place of atof() because of error processing.  */
 
-IX DblCon( I1 *str, R8 *f )
-  {
+IX DblCon(I1 *str, R8 *f)
+{
   I1 *endptr;
   R8 value;
   IX eflag=0;
@@ -422,20 +439,24 @@ IX DblCon( I1 *str, R8 *f )
 #endif
 
   endptr = str;
-  value = strtod( str, &endptr );
-  if(*endptr != '\0')
+  value = strtod(str, &endptr);
+  if(*endptr != '\0') {
     eflag = 1;
+  }
 #if( !__GNUC__)
-  if( errno ) eflag = 1;
+  if(errno) {
+    eflag = 1;
+  }
 #endif
 
-  if( eflag )
+  if(eflag) {
     *f = 0.0;
-  else
+  } else {
     *f = value;
+  }
   return eflag;
   
-  }  /* end of DblCon */
+}  /* end of DblCon */
 
 /***  FltCon  *****************************************************************/
 
@@ -444,25 +465,29 @@ IX DblCon( I1 *str, R8 *f )
  *  Floats are in the range -3.4e38 to +3.4e38 (FLT_MIN to FLT_MAX).
  *  Used in place of atof() because of error processing.  */
 
-IX FltCon( I1 *str, R4 *f )
-  {
+IX FltCon(I1 *str, R4 *f)
+{
   R8 value;    /* compute result in high precision, then chop */
   IX eflag=0;
 
-  if(DblCon(str, &value))
+  if(DblCon(str, &value)) {
     eflag = 1;
-  if(value > FLT_MAX)
+  }
+  if(value > FLT_MAX) {
     eflag = 1;
-  if(value < -FLT_MAX)
+  }
+  if(value < -FLT_MAX) {
     eflag = 1;
+  }
 
-  if( eflag )
+  if(eflag) {
     *f = 0.0;
-  else
+  } else {
     *f = (R4)value;
+  }
   return eflag;
   
-  }  /* end of FltCon */
+}  /* end of FltCon */
 
 #include <time.h>   /* prototype: clock;  define CLOCKS_PER_SEC */
 
@@ -471,8 +496,8 @@ IX FltCon( I1 *str, R4 *f )
 /*  Determine elapsed time.  Call once to determine t1;
     call later to get elapsed time. */
 
-R4 CPUtime( R4 t1 )
-  {
+R4 CPUtime(R4 t1)
+{
   R4 t2;
 #ifdef USE_RUSAGE
   struct rusage r2;
@@ -483,7 +508,7 @@ R4 CPUtime( R4 t1 )
 #endif
   return (t2-t1);
 
-  }  /* end CPUtime */
+}  /* end CPUtime */
 
 
 
