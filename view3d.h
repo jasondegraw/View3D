@@ -49,18 +49,17 @@
 #define EPS 1.0e-6
 #define EPS2 1.0e-12
 
-typedef struct v2d       /* structure for 2D vertex */
-  {
+typedef struct v2d {     /* structure for 2D vertex */
   R8  x;  /* X-coordinate */
   R8  y;  /* Y-coordinate */
-  } VERTEX2D;
+} VERTEX2D;
 
-typedef struct v3d       /* structure for a 3D vertex or vector */
-  {
+typedef struct v3d {     /* structure for a 3D vertex or vector */
+
   R8  x;  /* X-coordinate */
   R8  y;  /* Y-coordinate */
   R8  z;  /* Z-coordinate */
-  } V3D;
+} V3D;
 
 #define VERTEX3D V3D
 #define VECTOR3D V3D
@@ -103,16 +102,14 @@ typedef struct v3d       /* structure for a 3D vertex or vector */
     b->y = c * a->y; \
     b->z = c * a->z; 
 
-typedef struct dircos         /* structure for direction cosines */
-  {
+typedef struct dircos {       /* structure for direction cosines */
   R8  x;  /* X-direction cosine */
   R8  y;  /* Y-direction cosine */
   R8  z;  /* Z-direction cosine */
   R8  w;  /* distance from surface to origin (signed) */
-  } DIRCOS;
+} DIRCOS;
 
-typedef struct srfdat3d       /* structure for 3D surface data */
-  {
+typedef struct srfdat3d {     /* structure for 3D surface data */
   IX nr;              /* surface number */
   IX nv;              /* number of vertices */
   IX shape;           /* 3 = triangle; 4 = parallelogram; 0 = other */
@@ -126,7 +123,7 @@ typedef struct srfdat3d       /* structure for 3D surface data */
                          -1: N behind S; +1: N in front of S;
                           0: part of N behind S, part in front */
   IX MrelS;           /* orientation of srf M relative to S */
-  } SRFDAT3D;
+} SRFDAT3D;
 
 #define RSRF 0  /* normal surface */
 #define SUBS 1  /* subsurface */
@@ -134,8 +131,7 @@ typedef struct srfdat3d       /* structure for 3D surface data */
 #define NULS 3  /* null surface */
 #define OBSO 4  /* obstruction only surface */
 
-typedef struct srfdatnm       /* structure for 3D surface data */
-  {
+typedef struct srfdatnm {     /* structure for 3D surface data */
   IX nr;              /* surface number */
   IX nv;              /* number of vertices */
   IX shape;           /* 3 = triangle; 4 = rectangle; 0 = other */
@@ -146,10 +142,9 @@ typedef struct srfdatnm       /* structure for 3D surface data */
   VERTEX3D ctd;       /* coordinates of centroid */
   VERTEX3D v[MAXNV1]; /* coordinates of vertices */
   R8 dist[MAXNV1];    /* distances of vertices above plane of other surface */
-  } SRFDATNM;
+} SRFDATNM;
 
-typedef struct srfdat3x       /* structure for 3D surface data */
-  {
+typedef struct srfdat3x {    /* structure for 3D surface data */
   IX nr;              /* surface number */
   IX nv;              /* number of vertices */
   IX shape;           /* 3 = triangle; 4 = rectangle; 0 = other */
@@ -159,28 +154,25 @@ typedef struct srfdat3x       /* structure for 3D surface data */
   DIRCOS dc;          /* direction cosines of surface normal */
   VERTEX3D ctd;       /* coordinates of centroid */
   VERTEX3D v[MAXNV1]; /* coordinates of vertices */
-  } SRFDAT3X;
+} SRFDAT3X;
 
-typedef struct edgedcs    /* structure for direction cosines of polygon edge */
-  {
+typedef struct edgedcs {   /* structure for direction cosines of polygon edge */
   R8  x;  /* X-direction cosine */
   R8  y;  /* Y-direction cosine */
   R8  z;  /* Z-direction cosine */
   R8  s;  /* length of edge */
-  } EDGEDCS;
+} EDGEDCS;
 
-typedef struct edgediv    /* structure for Gaussian division of polygon edge */
-  {
+typedef struct edgediv {   /* structure for Gaussian division of polygon edge */
   R8  x;  /* X-coordinate of element */
   R8  y;  /* Y-coordinate of element */
   R8  z;  /* Z-coordinate of element */
   R8  s;  /* length of element */
-  } EDGEDIV;
+} EDGEDIV;
 
-typedef struct          /* view factor calculation control values */
-  {
+typedef struct {         /* view factor calculation control values */
   IX nAllSrf;       /* total number of surfaces */
-  IX nRadSrf;       /* number of radiating surfaces; 
+  IX nRadSrf;       /* number of radiating surfaces;
                          initially includes mask & null surfaces */
   IX nMaskSrf;      /* number of mask & null surfaces */
   IX nObstrSrf;     /* number of obstruction surfaces */
@@ -213,11 +205,11 @@ typedef struct          /* view factor calculation control values */
   IX failConverge;  /* 1 if any calculation failed to converge */
   SRFDAT3X srf1T;   /* participating surface; transformed coordinates */
   SRFDAT3X srf2T;   /* participating surface; transformed coordinates;
-                       view from srf1T toward srf2T. */ 
+                       view from srf1T toward srf2T. */
   SRFDAT3X *srfOT;  /* pointer to array of view obstrucing surfaces;
                        dimensioned from 0 to maxSrfT in View3d();
                        coordinates transformed relative to srf2T. */
-  } VFCTRL;
+} VFCTRL;
 
 #define UNK -1  /* unknown integration method */
 #define DAI 0   /* double area integration */
@@ -226,22 +218,20 @@ typedef struct          /* view factor calculation control values */
 #define SLI 3   /* single line integration */
 #define ALI 4   /* adaptive line integration */
 
-typedef struct hcve   /* homogeneous coordinate description of vertex/edge */
-  {
+typedef struct hcve { /* homogeneous coordinate description of vertex/edge */
   struct hcve *next;  /* pointer to next vertex/edge */
   IX buffer;          /* for structure alignment */
   R8 x, y;    /* X and Y coordinates of the vertex */
   R8 a, b;    /* A, B */
   R8 c;       /*  & C homogeneous coordinates of the edge */
-  } HCVE;
+} HCVE;
 
-typedef struct poly   /* description of a polygon */
-  {
+typedef struct poly { /* description of a polygon */
   struct poly *next;  /* pointer to next polygon */
   HCVE *firstVE;      /* pointer to first vertex of polygon */
   R8 trns;            /* (0.0 <= transparency <= 1.0) */
   R8 area;            /* area of the polygon */
-  } POLY;
+} POLY;
 
 /* macros for simple mathematical operations */
 #define MAX(a,b)  (((a) > (b)) ? (a) : (b))   /* max of 2 values */
@@ -250,45 +240,44 @@ typedef struct poly   /* description of a polygon */
 /*  function prototypes.  */
 
 /* input / output */
-void CountVS3D( I1 *title, VFCTRL *vfCtrl );
+void CountVS3D(I1 *title, VFCTRL *vfCtrl);
 void GetVS3D(I1 **name, R4 *emit, IX *base, IX *cmbn,SRFDAT3D *srf,
              VERTEX3D *xyz, VFCTRL *vfCtrl);
 void GetVS3Da(I1 **name, R4 *emit, IX *base, IX *cmbn,SRFDAT3D *srf,
-              VERTEX3D *xyz, VFCTRL *vfCtrl );
+              VERTEX3D *xyz, VFCTRL *vfCtrl);
 R8 VolPrism(VERTEX3D *a, VERTEX3D *b, VERTEX3D *c);
 void SetPlane(SRFDAT3D *srf);
 void ReportAF(const IX nSrf, const IX encl, const I1 *title, I1 ** name, 
-              const R4 *area, const R4 *emit, const IX *base, R8 ** AF, 
+              const R4 *area, const R4 *emit, const IX *base, R8 ** AF,
               IX flag);
 
-     /* 3-D view factor functions */
+/* 3-D view factor functions */
 void View3D(SRFDAT3D *srf, const IX *base, IX *possibleObstr,R8 **AF,
-            VFCTRL *vfCtrl );
+            VFCTRL *vfCtrl);
 IX ProjectionDirection(SRFDAT3D *srf, SRFDATNM *srfn, SRFDATNM *srfm,
                        IX *los, VFCTRL *vfCtrl);
-IX errorf( IX severity, I1 *file, IX line, ... );
 
-R8 ViewUnobstructed( VFCTRL *vfCtrl, IX row, IX col );
+R8 ViewUnobstructed(VFCTRL *vfCtrl, IX row, IX col);
 R8 View2AI(const IX nss1, const DIRCOS *dc1, const VERTEX3D *pt1, 
-           const R8 *area1, const IX nss2, const DIRCOS *dc2, 
-           const VERTEX3D *pt2, const R8 *area2 );
+           const R8 *area1, const IX nss2, const DIRCOS *dc2,
+           const VERTEX3D *pt2, const R8 *area2);
 R8 View2LI(const IX nd1, const IX nv1, const EDGEDCS *rc1, EDGEDIV **dv1,
-           const IX nd2, const IX nv2, const EDGEDCS *rc2, EDGEDIV **dv2 );
+           const IX nd2, const IX nv2, const EDGEDCS *rc2, EDGEDIV **dv2);
 R8 View1LI(const IX nd1, const IX nv1, const EDGEDCS *rc1, EDGEDIV **dv1,
            const VERTEX3D *v1, const IX nv2, const VERTEX3D *v2);
 R8 V1LIpart(const VERTEX3D *pp, const VERTEX3D *b0, const VERTEX3D *b1,
-  const VECTOR3D *B, const R8 b2, IX *flag );
+            const VECTOR3D *B, const R8 b2, IX *flag);
 R8 V1LIxact(const VERTEX3D *a0, const VERTEX3D *a1, const R8 a, 
             const VERTEX3D *b0, const VERTEX3D *b1, const R8 b);
 R8 V1LIadapt(VERTEX3D Pold[3], R8 dFold[3], R8 h, const VERTEX3D *b0,
-             const VERTEX3D *b1, const VECTOR3D *B, const R8 b2, IX level, 
-             VFCTRL *vfCtrl );
+const VERTEX3D *b1, const VECTOR3D *B, const R8 b2, IX level,
+VFCTRL *vfCtrl);
 R8 ViewALI(const IX nv1, const VERTEX3D *v1, const IX nv2, const VERTEX3D *v2,
-           VFCTRL *vfCtrl );
+           VFCTRL *vfCtrl);
 void ViewsInit(IX maxDiv, IX init);
 IX DivideEdges(IX nd, IX nv, VERTEX3D *vs, EDGEDCS *rc, EDGEDIV **dv);
 IX GQParallelogram(const IX nDiv, const VERTEX3D *vp, VERTEX3D *p, R8 *w);
-IX GQTriangle( const IX nDiv, const VERTEX3D *vt, VERTEX3D *p, R8 *w);
+IX GQTriangle(const IX nDiv, const VERTEX3D *vt, VERTEX3D *p, R8 *w);
 IX SubSrf(const IX nDiv, const IX nv, const VERTEX3D *v, const R8 area,
           VERTEX3D *pt, R8 *wt);
 
@@ -308,17 +297,17 @@ IX AddMaskSrf(SRFDAT3D *srf, const SRFDATNM *srfN, const SRFDATNM *srfM,
               const IX *maskSrf, const IX *baseSrf, VFCTRL *vfCtrl, IX *los,
               IX nPoss);
 IX BoxTest(SRFDAT3D *srf, SRFDATNM *srfn, SRFDATNM *srfm, VFCTRL *vfCtrl,
-  IX *los, IX nProb );
+           IX *los, IX nProb);
 IX ClipPolygon(const IX flag, const IX nv, VERTEX3D *v, R8 *dot, VERTEX3D *vc);
 IX ConeRadiusTest(SRFDAT3D *srf, SRFDATNM *srfn, SRFDATNM *srfm,
                   VFCTRL *vfCtrl, IX *los, IX nProb, R8 distNM);
 IX CylinderRadiusTest(SRFDAT3D *srf, SRFDATNM *srfN, SRFDATNM *srfM, IX *los,
                       R8 distNM, IX nProb);
-IX OrientationTest( SRFDAT3D *srf, SRFDATNM *srfn, SRFDATNM *srfm, 
-  VFCTRL *vfCtrl, IX *los, IX nProb );
+IX OrientationTest(SRFDAT3D *srf, SRFDATNM *srfn, SRFDATNM *srfm,
+                   VFCTRL *vfCtrl, IX *los, IX nProb);
 IX OrientationTestN(SRFDAT3D *srf, IX N, VFCTRL *vfCtrl, IX *possibleObstr,
                     IX nPossObstr);
-void SelfObstructionClip(SRFDATNM *srfn );
+void SelfObstructionClip(SRFDATNM *srfn);
 IX SetShape(const IX nv, VERTEX3D *v, R8 *area);
 IX SelfObstructionTest3D(SRFDAT3D *srf1, SRFDAT3D *srf2, SRFDATNM *srfn);
 void IntersectionTest(SRFDATNM *srfn, SRFDATNM *srfm);
@@ -359,7 +348,7 @@ void DumpVA(I1 *title, const IX rows, const IX cols, R8 *a);
 IX DelNull(const IX nSrf, SRFDAT3D *srf, IX *base, IX *cmbn, R4 *emit,
            R4 *area, I1 **name, R8 **AF);
 void NormAF(const IX nSrf, const R4 *emit, const R4 *area, R8 **AF,
-            const R8 eMax, const IX itMax );
+            const R8 eMax, const IX itMax);
 IX Combine(const IX nSrf, const IX *cmbn, R4 *area, I1 **name, R8 **AF);
 void Separate(const IX nSrf, const IX *base, R4 *area, R8 **AF);
 void IntFac(const IX nSrf, const R4 *emit, const R4 *area, R8 **AF);
