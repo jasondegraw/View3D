@@ -110,7 +110,7 @@ IX PolygonOverlap(const POLY *p1, POLY *p2, const IX savePD, IX freeP2)
   IX overlap=0; /* 0: P2 outside P1; 1: P2 inside P1; 2: part overlap */
   IX j, jm1;    /* vertex indices;  jm1 = j - 1 */
 
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, "PolygonOverlap:  P1 [%p]  P2 [%p]  flag %d\n",
           p1, p2, savePD);
 #endif
@@ -118,7 +118,7 @@ IX PolygonOverlap(const POLY *p1, POLY *p2, const IX savePD, IX freeP2)
   initUsedPD = _nextUsedPD;
   nTempVrt = GetPolygonVrt2D(p2, _tempVrt);
 
-#ifdef DEBUGX
+#ifdef DEBUG
   DumpP2D("P2:", nTempVrt, _tempVrt);
 #endif
 
@@ -129,7 +129,7 @@ IX PolygonOverlap(const POLY *p1, POLY *p2, const IX savePD, IX freeP2)
     //    IX u[MAXNVT];  /* +1 = vertex left of edge; -1 = vertex right of edge */
     IX left=1;     /* true if all vertices left of edge */
     IX right=1;    /* true if all vertices right of edge */
-#ifdef DEBUGX
+#ifdef DEBUG
     fprintf(_ulog, "Test against edge of P1\nU:");
 #endif
 
@@ -149,11 +149,11 @@ IX PolygonOverlap(const POLY *p1, POLY *p2, const IX savePD, IX freeP2)
       } else {
         _u[j] = 0;
       }
-#ifdef DEBUGX
+#ifdef DEBUG
       fprintf(_ulog, " %d", _u[j]);
 #endif
     }
-#ifdef DEBUGX
+#ifdef DEBUG
     fprintf(_ulog, "\nQuick test:  right %d; left %d;\n", right, left);
 #endif
 
@@ -175,7 +175,7 @@ IX PolygonOverlap(const POLY *p1, POLY *p2, const IX savePD, IX freeP2)
         b = _tempVrt[j].x - _tempVrt[jm1].x;
         c = _tempVrt[j].y * _tempVrt[jm1].x - _tempVrt[jm1].y * _tempVrt[j].x;
         w = b * a1 - a * b1;
-#ifdef DEBUGX
+#ifdef DEBUG
         if(fabs(w) < _epsArea*(a+b+c)) {
           error(1, __FILE__, __LINE__, "small W in PolygonOverlap");
           DumpHC("P1:", p1, p1);
@@ -185,7 +185,7 @@ IX PolygonOverlap(const POLY *p1, POLY *p2, const IX savePD, IX freeP2)
           fprintf(_ulog, "x, y: %g %g\n", (c*b1-b*c1)/w, (a*c1-c*a1)/w);
         }
 #endif
-#ifdef DEBUGX
+#ifdef DEBUG
         if(w == 0.0) {
           error(3, __FILE__, __LINE__,
                 "Division by zero (w=0) in PolygonOverlap");
@@ -204,7 +204,7 @@ IX PolygonOverlap(const POLY *p1, POLY *p2, const IX savePD, IX freeP2)
       }
     }  /* end of short loop */
 
-#ifdef DEBUGX
+#ifdef DEBUG
     DumpP2D("Left polygon:", nLeftVrt, _leftVrt);
     DumpP2D("Right polygon:", nRightVrt, _rightVrt);
 #endif
@@ -227,7 +227,7 @@ IX PolygonOverlap(const POLY *p1, POLY *p2, const IX savePD, IX freeP2)
 
     if(savePD > 1) { /* transfer left vertices to outside polygon */
       nTempVrt = TransferVrt(_tempVrt, _leftVrt, nLeftVrt);
-#ifdef DEBUGX
+#ifdef DEBUG
       DumpP2D("Outside polygon:", nTempVrt, _tempVrt);
 #endif
       if(nTempVrt > 2) {
@@ -238,7 +238,7 @@ IX PolygonOverlap(const POLY *p1, POLY *p2, const IX savePD, IX freeP2)
 
     /* transfer right side vertices to tempVrt */
     nTempVrt = TransferVrt(_tempVrt, _rightVrt, nRightVrt);
-#ifdef DEBUGX
+#ifdef DEBUG
     DumpP2D("Inside polygon:", nTempVrt, _tempVrt);
 #endif
     if(nTempVrt < 2) { /* 2 instead of 3 allows degenerate P2; espArea = 0 */
@@ -250,7 +250,7 @@ IX PolygonOverlap(const POLY *p1, POLY *p2, const IX savePD, IX freeP2)
   /* At this point tempVrt contains the overlap of P1 and P2. */
 
   if(savePD < 3) {   /* save the overlap polygon */
-#ifdef DEBUGX
+#ifdef DEBUG
     DumpP2D("Overlap polygon:", nTempVrt, _tempVrt);
 #endif
     pp = SetPolygonHC(nTempVrt, _tempVrt, p2->trns * p1->trns);
@@ -263,7 +263,7 @@ IX PolygonOverlap(const POLY *p1, POLY *p2, const IX savePD, IX freeP2)
 
 p2_outside_p1:     /* no overlap between P1 and P2 */
   overlap = 0;
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, "P2 outside P1\n");
 #endif
   if(savePD > 1) {   /* save outside polygon - P2 */
@@ -289,7 +289,7 @@ p2_outside_p1:     /* no overlap between P1 and P2 */
         pv2 = pv2->next;
       } while(pv2 != p2->firstVE);
       pv->next = pp->firstVE;   /* complete circular list */
-#ifdef DEBUGX
+#ifdef DEBUG
       DumpHC("COPIED SURFACE:", pp, pp);
 #endif
     }
@@ -353,7 +353,7 @@ POLY *SetPolygonHC(const IX nVrt, const VERTEX2D *polyVrt, const R8 trns)
   IX j, jm1;   /* vertex indices;  jm1 = j - 1 */
 
   pp = GetPolygonHC();      /* get cleared polygon data area */
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, " SetPolygonHC:  pp [%p]  nv %d\n", pp, nVrt);
 #endif
 
@@ -375,7 +375,7 @@ POLY *SetPolygonHC(const IX nVrt, const VERTEX2D *polyVrt, const R8 trns)
 
   pp->area = 0.5 * area;
   pp->trns = trns;
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, "  areas:  %f  %f,  trns:  %f\n",
           pp->area, _epsArea, pp->trns);
   fflush(_ulog);
@@ -451,7 +451,7 @@ void FreePolygons(POLY *first, POLY *last)
   HCVE *pv; /* pointer to edge/vertex */
 
   for(pp=first; ; pp=pp->next) {
-#ifdef DEBUGX
+#ifdef DEBUG
     if(!pp) {
       error(3, __FILE__, __LINE__, "Polygon PP not defined in FreePolygons");
     }
@@ -587,7 +587,7 @@ void InitPolygonMem(const R8 epsdist, const R8 epsarea)
   _nextFreeVE = NULL;
   _nextFreePD = NULL;
   _nextUsedPD = NULL;
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, "InitPolygonMem: epsDist %g epsArea %g\n",
           _epsDist, _epsArea);
 #endif
@@ -745,7 +745,7 @@ IX LimitPolygon(IX nVrt, VERTEX2D polyVrt[],
 
 }  /*  end of LimitPolygon  */
 
-#ifdef DEBUGX
+#ifdef DEBUG
 /***  DumpHC.c  **************************************************************/
 
 /*  Print the descriptions of sequential polygons.  */

@@ -254,7 +254,7 @@ I1 *NxtWord(I1 *str, IX flag, IX maxlen)
   IX i=0;       // current position in str
   IX done=0;    // true when start of word is found or word is complete
 
-#ifdef DEBUGX
+#ifdef DEBUG
   if(!_unxt) {
     error(3, __FILE__, __LINE__, "_UNXT not open");
   }
@@ -283,7 +283,7 @@ I1 *NxtWord(I1 *str, IX flag, IX maxlen)
             NxtLine(str, maxlen);
           }
         }
-#ifdef DEBUGX
+#ifdef DEBUG
         if(flag > 4) {
           error(3, __FILE__, __LINE__, "Invalid flag: %d", flag);
         }
@@ -295,7 +295,7 @@ I1 *NxtWord(I1 *str, IX flag, IX maxlen)
   }
   else
   {
-#ifdef DEBUGX
+#ifdef DEBUG
     if(flag < 0) {
       error(3, __FILE__, __LINE__, "Invalid flag: %d", flag);
     }

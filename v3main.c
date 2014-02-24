@@ -123,7 +123,7 @@ IX main(IX argc, I1 **argv)
     error(3, __FILE__, __LINE__, "Cannot open \"%s\" for output", outFile);
 
   fprintf(_ulog, "  Program:  %s\n", argv[0]);
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, "  Version:  %s DEBUG\n", VERSIONSTR);
 #else
   fprintf(_ulog, "  Version:  %s\n", VERSIONSTR);
@@ -144,7 +144,7 @@ IX main(IX argc, I1 **argv)
 #endif
 #endif
 
-#ifdef DEBUGX
+#ifdef DEBUG
   _echo = 1;
 #endif
 
@@ -154,23 +154,12 @@ IX main(IX argc, I1 **argv)
   time(&bintime);
   curtime = localtime(&bintime);
   fprintf(_ulog, "Time:  %s", asctime(curtime));
-  fputs("\n\
-  View3D - calculation of view factors between simple polygons.\n\n\
-  This software was developed at the National Institute of\n\
-  Standards and Technology by employees of the Federal\n\
-  Government in the course of their official duties.\n\
-  Pursuant to title 17 Section 105 of the United States Code\n\
-  this software is not subject to copyright protection and\n\
-  is in the public domain. These programs are experimental\n\
-  systems. NIST assumes no responsibility whatsoever for their\n\
-  use by other parties, and makes no guarantees, expressed or\n\
-  implied, about its quality, reliability, or any other\n\
-  characteristic.   We would appreciate acknowledgment if the\n\
-  software is used. This software can be redistributed and/or\n\
-  modified freely provided that any derivative works bear some\n\
-  notice that they are derived from it, and any modified\n\
-  versions bear some notice that they have been modified.\n\n",_ulog);
+  fputs("\nView3D - calculation of view factors between simple polygons.\n\n\
+  This software is distributed in the hope that it will be useful,\n\
+  but WITHOUT ANY WARRANTY; without even the implied warranty\n\
+  of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",stderr);
 
+  fprintf(stderr,"Beginning view factor calculation\n");
   /* Record the start-of-run time */
   time0 = CPUtime(0.0);
 
@@ -313,7 +302,7 @@ IX main(IX argc, I1 **argv)
   time1 = CPUtime(0.0);  /* start-of-VF-calculation time */
   possibleObstr = Alc_V(1, vfCtrl.nAllSrf, sizeof(IX), __FILE__, __LINE__);
   vfCtrl.nPossObstr = SetPosObstr3D(vfCtrl.nAllSrf, srf, possibleObstr);
-  sprintf(_string, "\n %.2f seconds to determine %d possible view obstructing surfaces",
+  sprintf(_string, " %.2f seconds to determine %d possible view obstructing surfaces",
     CPUtime(time1), vfCtrl.nPossObstr);
   fputs(_string, stderr);
   fputs("\n\n", stderr);
@@ -328,24 +317,24 @@ IX main(IX argc, I1 **argv)
   if(vfCtrl.row) {
     AF = Alc_MC(vfCtrl.row, vfCtrl.row, 1, nSrf0, sizeof(R8), __FILE__, __LINE__);
     if(vfCtrl.col) {
-      fprintf(stderr, "\nComputing view factor for surface %d to surface %d\n\n",
-        vfCtrl.row, vfCtrl.col);
+      fprintf(stderr, "Computing view factor for surface %d to surface %d\n\n",
+              vfCtrl.row, vfCtrl.col);
     } else {
-      fprintf(stderr, "\nComputing view factors for surface %d\n\n",
-        vfCtrl.row);
+      fprintf(stderr, "Computing view factors for surface %d\n\n",
+              vfCtrl.row);
     }
-    } else {
+  } else {
     time1 = CPUtime(0.0);
     AF = Alc_MSR(1, nSrf0, sizeof(R8), __FILE__, __LINE__);
     time1 = CPUtime(time1);
     if(time1 > 1) {
       sprintf(_string, "\n %.2f seconds to allocate %ld byte view factor matrix\n",
-        time1, 4*(n+1)*n);
+              time1, 4*(n+1)*n);
       fputs(_string, stderr);
       fputs(_string, _ulog);
-      }
-    fprintf(stderr, "\nComputing view factors for all %d surfaces\n\n", nSrf0);
     }
+    fprintf(stderr, "Computing view factors for all %d surfaces\n\n", nSrf0);
+  }
 
   if(_list>0) {
     MemRem("At start of View3D()");
@@ -354,7 +343,12 @@ IX main(IX argc, I1 **argv)
 
   View3D(srf, base, possibleObstr, AF, &vfCtrl);  /*** view factor calculation ***/
 
-  fprintf(_ulog, "\n%7.2f seconds to compute view factors.\n", CPUtime(time1));
+  //fprintf(_ulog, "\n%7.2f seconds to compute view factors\n", CPUtime(time1));
+
+  sprintf(_string, " %.2f seconds to compute view factors\n", CPUtime(time1));
+  fputs(_string, stderr);
+  fputs(_string, _ulog);
+
   if(_list>0) {
     MemRem("At end of View3D()");
   }
@@ -410,8 +404,8 @@ IX main(IX argc, I1 **argv)
 
   for(n=nSrf; n; n--) { /* clear base pointers to OBSO & MASK srfs */
     if(srf[base[n]].type == OBSO) { /* Base is used for several things. */
-      base[n] = 0;                    /* It must be progressively cleared */
-    }                                 /* as each use is completed. */
+      base[n] = 0;                  /* It must be progressively cleared */
+    }                               /* as each use is completed. */
     if(srf[n].type == MASK) {
       base[n] = 0;
     }
@@ -494,7 +488,7 @@ IX main(IX argc, I1 **argv)
         name, area, vtmp, base, AF, 0);
     }
     }
-  sprintf(_string, "%7.2f seconds to adjust view factors.\n", CPUtime(time1));
+  sprintf(_string, " %.2f seconds to adjust view factors\n", CPUtime(time1));
   fputs(_string, stderr);
   fputs(_string, _ulog);
 
@@ -502,7 +496,7 @@ IX main(IX argc, I1 **argv)
     fprintf(stderr, "\nProcessing surface emissivites\n");
     time1 = CPUtime(0.0);
     IntFac(nSrf, emit, area, AF);
-    sprintf(_string, "%7.2f seconds to include emissivities.\n", CPUtime(time1));
+    sprintf(_string, " %.2f seconds to include emissivities\n", CPUtime(time1));
     fputs(_string, stderr);
     fputs(_string, _ulog);
     if(_list>1) {
@@ -527,11 +521,11 @@ IX main(IX argc, I1 **argv)
   CPUtime(0.0);
   SaveVF(outFile, PROGRAMSTR, VERSIONSTR, vfCtrl.outFormat, vfCtrl.enclosure,
          vfCtrl.emittances, nSrf, area, emit, AF, vtmp);
-  sprintf(_string, "%7.2f seconds to write view factors.\n", CPUtime(time1));
+  sprintf(_string, " %.2f seconds to write view factors\n", CPUtime(time1));
   fputs(_string, stderr);
   fputs(_string, _ulog);
 
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, "\nFinal list of surfaces:\n");
   fprintf(_ulog, "   #        name     area  emit\n");
   for(n=1; n<=nSrf; n++) {
@@ -554,7 +548,9 @@ FreeMemory:
   Fre_MC((void **)name, 1, nSrf0, 0, NAMELEN, sizeof(I1), __FILE__, __LINE__);
   MemRem("After all calculations");
 
-  fprintf(_ulog, "\n%7.2f seconds for all calculations.\n", CPUtime(time0));
+  sprintf(_string, "\n%.2f seconds for all calculations.\n", CPUtime(time0));
+  fputs(_string,_ulog);
+  fputs(_string,stderr);
   time(&bintime);
   curtime = localtime(&bintime);
   fprintf(_ulog, "Time:  %s", asctime(curtime));

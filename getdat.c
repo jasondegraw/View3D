@@ -27,12 +27,6 @@
 /*  bear some notice that they have been modified.                            */
 /*                                                                            */
 /******************************************************************************/
-#ifdef _DEBUG
-# define DEBUG 1
-#else
-# define DEBUG 1
-#endif
-
 #include <stdio.h>
 #include <string.h> /* prototype: memcpy, strcpy, strncpy */
 #include <stdlib.h> /* prototype: atoi, atof */

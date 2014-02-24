@@ -50,7 +50,6 @@
 #include "prtyp.h"  // miscellaneous function prototypes
 
 extern FILE *_ulog;   // program log file
-I1 _heapmsg[256];     // buffer for heap messages
 
 I4 _bytesAllocated=0L;  // through Alc_E()
 I4 _bytesFreed=0L;      // through Fre_E()
@@ -69,7 +68,7 @@ MEMLIST *_memList=NULL;
 # endif
 #endif
 
-/***  Alc_E.c  ***************************************************************/
+/***  Alc_E  ******************************************************************/
 
 /*  Allocate memory for a single element, i.e. contiguous portion of the heap.
  *  This may be a single structure or an array. All allocated bytes set to 0.
@@ -164,7 +163,7 @@ void *Alc_E(I4 length, I1 *file, IX line)
 
 }  /*  end of Alc_E  */
 
-/***  Chk_E.c  ***************************************************************/
+/***  Chk_E  ******************************************************************/
 
 /*  Check guard bytes around memory allocated by Alc_E().
  *  Return non-zero if heap is in error.  */
@@ -222,7 +221,7 @@ IX Chk_E(void *pm, UX length, I1 *file, IX line)
 
 }  /*  end of Chk_E  */
 
-/***  Fre_E.c  ***************************************************************/
+/***  Fre_E  ******************************************************************/
 
 /*  Free pointer to previously memory allocated by Alc_E().
  *  Includes a memory check.  */
@@ -275,7 +274,7 @@ void *Fre_E(void *pm, UX length, I1 *file, IX line)
 
 }  /*  end of Fre_E  */
 
-/***  MemNet.c  **************************************************************/
+/***  MemNet  *****************************************************************/
 
 /*  Report memory allocated and freed.  */
 
@@ -291,7 +290,7 @@ I4 MemNet(I1 *msg)
 
 }  /* end of MemNet */
 
-/***  MemList.c  *************************************************************/
+/***  MemList  ****************************************************************/
 
 /*  Report current allocated memory.  */
 
@@ -322,7 +321,7 @@ void MemList(void)
 # include <alloc.h> // prototype: heapcheck, heapwalk
 #endif
 
-/***  MemRem.c  **************************************************************/
+/***  MemRem  *****************************************************************/
 
 /*  Report memory allocated and freed. Tubro C's coreleft() reports the amount
  *  of memory between the highest allocated block and the top of the heap.
@@ -366,7 +365,7 @@ void MemRem(I1 *msg)
 
 #define ANSIOFFSET 1 // 1 = include V[0] in vector allocation
 
-/***  Alc_V.c  ***************************************************************/
+/***  Alc_V  ******************************************************************/
 
 /*  Allocate pointer for a vector with optional debugging data.
  *  This vector is accessed and stored as:
@@ -437,7 +436,7 @@ void *Alc_V(IX min_index, I4 max_index, IX size, I1 *file, IX line)
 }  /*  end of Alc_V  */
 
 #if( MEMTEST > 0 )
-/***  Chk_V.c  ***************************************************************/
+/***  Chk_V  ******************************************************************/
 
 /*  Check a vector allocated by Alc_V().  */
 
@@ -478,7 +477,7 @@ void Chk_V(void *v, IX min_index, IX max_index, IX size, I1 *file, IX line)
 }  /*  end of Chk_V  */
 #endif
 
-/***  Clr_V.c  ***************************************************************/
+/***  Clr_V  ******************************************************************/
 
 /*  Clear (zero all elements of) a vector created by Alc_V().  */
 
@@ -499,7 +498,7 @@ void Clr_V(void *v, IX min_index, IX max_index, IX size, I1 *file, IX line)
 
 }  /*  end of Clr_V  */
 
-/***  Fre_V.c  ***************************************************************/
+/***  Fre_V  ******************************************************************/
 
 /*  Free pointer to a vector allocated by Alc_V().  */
 
@@ -532,7 +531,7 @@ void *Fre_V(void *v, IX min_index, IX max_index, IX size, I1 *file, IX line)
 
 }  /*  end of Fre_V  */
 
-/***  Alc_MC.c  **************************************************************/
+/***  Alc_MC  *****************************************************************/
 
 /*  Allocate (contiguously) a matrix, M[i][j].
  *  This matrix is accessed (and stored) in a rectangular form:
@@ -581,7 +580,7 @@ void *Alc_MC(IX min_row_index, IX max_row_index, IX min_col_index,
 }  /*  end of Alc_MC  */
 
 #if( MEMTEST > 0 )
-/***  Chk_MC.c  **************************************************************/
+/***  Chk_MC  *****************************************************************/
 
 /*  Check a matrix allocated by Alc_MC().  */
 
@@ -601,7 +600,7 @@ void Chk_MC(void *m, IX min_row_index, IX max_row_index, IX min_col_index,
 }  /*  end of Chk_MC  */
 #endif
 
-/***  Clr_MC.c  **************************************************************/
+/***  Clr_MC  *****************************************************************/
 
 /*  Clear (zero all elements of) a matrix created by Alc_MC().  */
 
@@ -623,7 +622,7 @@ void Clr_MC(void *m, IX min_row_index, IX max_row_index, IX min_col_index,
 
 }  /*  end of Clr_MC  */
 
-/***  Fre_MC.c  **************************************************************/
+/***  Fre_MC  *****************************************************************/
 
 /*  Free pointer to a matrix allocated by Alc_MC().  */
 
@@ -644,7 +643,7 @@ void *Fre_MC(void *m, IX min_row_index, IX max_row_index, IX min_col_index,
 
 }  /*  end of Fre_MC  */
 
-/***  Alc_MSR.c  *************************************************************/
+/***  Alc_MSR  ****************************************************************/
 
 /*  Allocate (by rows) a symmertic matrix.
  *  This matrix is accessed (and stored) in a triangular form:
@@ -686,7 +685,7 @@ void *Alc_MSR(IX min_index, IX max_index, IX size, I1 *file, IX line)
 }  /*  end of Alc_MSR  */
 
 #if( MEMTEST > 0 )
-/***  Chk_MSR.c  *************************************************************/
+/***  Chk_MSR  ****************************************************************/
 
 /*  Check a symmetric matrix allocated by Alc_MSR().  */
 
@@ -705,7 +704,7 @@ void Chk_MSR(void *m, IX min_index, IX max_index, IX size, I1 *file, IX line)
 }  /*  end of Chk_MSR  */
 #endif
 
-/***  Clr_MSR.c  *************************************************************/
+/***  Clr_MSR  ****************************************************************/
 
 /*  Clear (zero all elements of) a symmetric matrix created by Alc_MSR().  */
 
@@ -726,7 +725,7 @@ void Clr_MSR(void *m, IX min_index, IX max_index, IX size, I1 *file, IX line)
 
 }  /*  end of Clr_MSR  */
 
-/***  Fre_MSR.c  *************************************************************/
+/***  Fre_MSR  ****************************************************************/
 
 /*  Free a symmertic matrix allocated by Alc_MSR.  */
 
@@ -751,7 +750,7 @@ void *Fre_MSR(void *v, IX min_index, IX max_index, IX size, I1 *file, IX line)
 
 }  /*  end of Fre_MSR  */
 
-/***  DumpV_IX.c  ************************************************************/
+/***  DumpV_IX  ***************************************************************/
 
 /*  Dump IX vector to FILE (with format control).  */
 
@@ -761,7 +760,7 @@ void DumpV_IX(IX *v, IX jmin, IX jmax,
   IX j;  // vector index
   IX n=0;  // number of values printed
 
-#ifdef DEBUGX
+#ifdef DEBUG
   if(!v) {
     error(3, __FILE__, __LINE__, "NULL vector for %s", title);
   }
@@ -787,13 +786,13 @@ void DumpV_IX(IX *v, IX jmin, IX jmax,
   if(n != 0) { // terminate last line of values
     fprintf(file, "\n");
   }
-#ifdef DEBUGX
+#ifdef DEBUG
   fflush(file);
 #endif
 
 }  /* end DumpV_IX */
 
-/***  DumpV_R4.c  ************************************************************/
+/***  DumpV_R4  ***************************************************************/
 
 /*  Dump R4 vector to FILE (with format control).  */
 
@@ -803,7 +802,7 @@ void DumpV_R4(R4 *v, IX jmin, IX jmax,
   IX j,  // vector index
       n=0;  // number of values printed
 
-#ifdef DEBUGX
+#ifdef DEBUG
   if(!v) {
     error(3, __FILE__, __LINE__, "NULL vector for %s", title);
   }
@@ -829,13 +828,13 @@ void DumpV_R4(R4 *v, IX jmin, IX jmax,
   if(n != 0) { // terminate last line of values
     fprintf(file, "\n");
   }
-#ifdef DEBUGX
+#ifdef DEBUG
   fflush(file);
 #endif
 
 }  /* end DumpV_R4 */
 
-/***  DumpV_R8.c  ************************************************************/
+/***  DumpV_R8  ***************************************************************/
 
 /*  Dump R8 vector to FILE (with format control).  */
 
@@ -845,7 +844,7 @@ void DumpV_R8(R8 *v, IX jmin, IX jmax,
   IX j;  // vector index
   IX n=0;  // number of values printed
 
-#ifdef DEBUGX
+#ifdef DEBUG
   if(!v) {
     error(3, __FILE__, __LINE__, "NULL vector for %s", title);
   }
@@ -871,13 +870,13 @@ void DumpV_R8(R8 *v, IX jmin, IX jmax,
   if(n != 0) { // terminate last line of values
     fprintf(file, "\n");
   }
-#ifdef DEBUGX
+#ifdef DEBUG
   fflush(file);
 #endif
 
 }  /* end DumpV_R8 */
 
-/***  DumpM_IX.c  ************************************************************/
+/***  DumpM_IX  ***************************************************************/
 
 /*  Dump IX matrix to FILE (with format control).  */
 
@@ -888,7 +887,7 @@ void DumpM_IX(IX **v, IX rmin, IX rmax, IX cmin, IX cmax,
   IX j;  // column index
   IX n;  // number of values printed - current row
 
-#ifdef DEBUGX
+#ifdef DEBUG
   if(!v) {
     error(3, __FILE__, __LINE__, "NULL vector for %s", title);
   }
@@ -921,13 +920,13 @@ void DumpM_IX(IX **v, IX rmin, IX rmax, IX cmin, IX cmax,
       fprintf(file, "row %2d:", i+1);
     }
   }
-#ifdef DEBUGX
+#ifdef DEBUG
   fflush(file);
 #endif
 
 }  /* end DumpM_IX */
 
-/***  DumpM_R4.c  ************************************************************/
+/***  DumpM_R4  ***************************************************************/
 
 /*  Dump R4 matrix to FILE (with format control).  */
 
@@ -938,7 +937,7 @@ void DumpM_R4(R4 **v, IX rmin, IX rmax, IX cmin, IX cmax,
   IX j;  // column index
   IX n;  // number of values printed - current row
 
-#ifdef DEBUGX
+#ifdef DEBUG
   if(!v) {
     error(3, __FILE__, __LINE__, "NULL vector for %s", title);
   }
@@ -971,13 +970,13 @@ void DumpM_R4(R4 **v, IX rmin, IX rmax, IX cmin, IX cmax,
       fprintf(file, "row %2d:", i+1);
     }
   }
-#ifdef DEBUGX
+#ifdef DEBUG
   fflush(file);
 #endif
 
 }  /* end DumpM_R4 */
 
-/***  DumpM_R8.c  ************************************************************/
+/***  DumpM_R8  ***************************************************************/
 
 /*  Dump R8 matrix to FILE (with format control).  */
 
@@ -988,7 +987,7 @@ void DumpM_R8(R8 **v, IX rmin, IX rmax, IX cmin, IX cmax,
   IX j;  // column index
   IX n;  // number of values printed - current row
 
-#ifdef DEBUGX
+#ifdef DEBUG
   if(!v) {
     error(3, __FILE__, __LINE__, "NULL vector for %s", title);
   }
@@ -1022,7 +1021,7 @@ void DumpM_R8(R8 **v, IX rmin, IX rmax, IX cmin, IX cmax,
       fprintf(file, "row %2d:", i+1);
     }
   }
-#ifdef DEBUGX
+#ifdef DEBUG
   fflush(file);
 #endif
 

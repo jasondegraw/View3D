@@ -66,7 +66,7 @@ R8 ViewUnobstructed(VFCTRL *vfCtrl, IX row, IX col)
   IX nmax, mmax;
   IX nDiv;
 
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, " VU %.2e", vfCtrl->epsAF);
 #endif
 
@@ -76,7 +76,7 @@ R8 ViewUnobstructed(VFCTRL *vfCtrl, IX row, IX col)
     AF1 = 2.0 * srf1->area;
   }
   if(vfCtrl->method == DAI) { /* double area integration */
-#ifdef DEBUGX
+#ifdef DEBUG
     fprintf(_ulog, " 2AI");
 #endif
     for(nDiv=1; nDiv<5; nDiv++) {
@@ -84,7 +84,7 @@ R8 ViewUnobstructed(VFCTRL *vfCtrl, IX row, IX col)
       nmax = SubSrf(nDiv, srf1->nv, srf1->v, srf1->area, pt1, area1);
       mmax = SubSrf(nDiv, srf2->nv, srf2->v, srf2->area, pt2, area2);
       AF1 = View2AI(nmax, &srf1->dc, pt1, area1, mmax, &srf2->dc, pt2, area2);
-#ifdef DEBUGX
+#ifdef DEBUG
       fprintf(_ulog, " %g", AF1);
 #endif
       if(fabs(AF1 - AF0) < vfCtrl->epsAF) {
@@ -93,14 +93,14 @@ R8 ViewUnobstructed(VFCTRL *vfCtrl, IX row, IX col)
     }
   }
   else if(vfCtrl->method == SAI) { /* single area integration */
-#ifdef DEBUGX
+#ifdef DEBUG
     fprintf(_ulog, " 1AI");
 #endif
     for(nDiv=1; nDiv<5; nDiv++) {
       AF0 = AF1;
       nmax = SubSrf(nDiv, srf1->nv, srf1->v, srf1->area, pt1, area1);
       AF1 = -View1AI(nmax, pt1, area1, &srf1->dc, srf2);
-#ifdef DEBUGX
+#ifdef DEBUG
       fprintf(_ulog, " %g", AF1);
 #endif
       if(fabs(AF1 - AF0) < vfCtrl->epsAF) {
@@ -108,14 +108,14 @@ R8 ViewUnobstructed(VFCTRL *vfCtrl, IX row, IX col)
       }
     }
   } else if(vfCtrl->method == SLI) { /* single line integration */
-#ifdef DEBUGX
+#ifdef DEBUG
     fprintf(_ulog, " 1LI");
 #endif
     for(nDiv=1; nDiv<5; nDiv++) {
       AF0 = AF1;
       DivideEdges(nDiv, srf1->nv, srf1->v, _rc1, _dv1);
       AF1 = View1LI(nDiv, srf1->nv, _rc1, _dv1, srf1->v, srf2->nv, srf2->v);
-#ifdef DEBUGX
+#ifdef DEBUG
       fprintf(_ulog, " %g", AF1);
 #endif
       if(fabs(AF1 - AF0) < vfCtrl->epsAF) {
@@ -123,7 +123,7 @@ R8 ViewUnobstructed(VFCTRL *vfCtrl, IX row, IX col)
       }
     }
   } else if(vfCtrl->method == DLI) { /* double line integration */
-#ifdef DEBUGX
+#ifdef DEBUG
     fprintf(_ulog, " 2LI");
 #endif
     for(nDiv=1; nDiv<5; nDiv++) {
@@ -131,7 +131,7 @@ R8 ViewUnobstructed(VFCTRL *vfCtrl, IX row, IX col)
       DivideEdges(nDiv, srf1->nv, srf1->v, _rc1, _dv1);
       DivideEdges(nDiv, srf2->nv, srf2->v, _rc2, _dv2);
       AF1 = View2LI(nDiv, srf1->nv, _rc1, _dv1, nDiv, srf2->nv, _rc2, _dv2);
-#ifdef DEBUGX
+#ifdef DEBUG
       fprintf(_ulog, " %g", AF1);
 #endif
       if(fabs(AF1 - AF0) < vfCtrl->epsAF) {
@@ -141,7 +141,7 @@ R8 ViewUnobstructed(VFCTRL *vfCtrl, IX row, IX col)
   }
 
   /* adaptive single line integration - method==ALI or simpler methods fail */
-#ifdef DEBUGX
+#ifdef DEBUG
   if(vfCtrl->method < ALI) {
     fprintf(_ulog, " Fixing view factor\n");
   }
@@ -157,7 +157,7 @@ R8 ViewUnobstructed(VFCTRL *vfCtrl, IX row, IX col)
 
   AF1 = ViewALI(srf1->nv, srf1->v, srf2->nv, srf2->v, vfCtrl);
 
-#ifdef DEBUGX
+#ifdef DEBUG
   if(vfCtrl->method < ALI) {
     fprintf(_ulog, "AF %g\n", AF1);
   }
@@ -165,12 +165,12 @@ R8 ViewUnobstructed(VFCTRL *vfCtrl, IX row, IX col)
   if(vfCtrl->method == ALI) { /* adaptive line integration */
     nDiv = 2;                 /* for bins[][] report */
   }
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, " %g", AF1);
 #endif
 
 done:
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, "\n");
 #endif
   vfCtrl->nEdgeDiv = nDiv;
@@ -247,7 +247,7 @@ R8 View2LI(const IX nd1, const IX nv1, const EDGEDCS *rc1, EDGEDIV **dv1,
         for(m=0; m<nd2; m++) {
           VECTOR((dv1[i]+n), (dv2[j]+m), (&R));
           r2 = VDOT((&R), (&R));
-#ifdef DEBUGX
+#ifdef DEBUG
           if(r2 < EPS) {
             error(2, __FILE__, __LINE__, "log(r2)=%6g in View2LI", r2);
           }
@@ -298,7 +298,7 @@ R8 View1LI(const IX nd1, const IX nv1, const EDGEDCS *rc1, EDGEDIV **dv1,
 
     VECTOR((v2+jm1), (v2+j), (&B));
     b2 = VDOT((&B), (&B));
-#ifdef DEBUGX
+#ifdef DEBUG
     if(b2 < EPS2) {
       error(2, __FILE__, __LINE__, "small b2=%6g in View1LI", b2);
     }
@@ -513,7 +513,7 @@ R8 ViewALI(const IX nv1, const VERTEX3D *v1,
   IX i, im1;    /* surface 1 edge index */
   IX j, jm1;    /* surface 2 edge index */
 
-#ifdef DEBUGX
+#ifdef DEBUG
   if(nv1>MAXNV1) {
     error(2, __FILE__, __LINE__, "MAXNV1 too small in ViewALI");
   }
@@ -525,7 +525,7 @@ R8 ViewALI(const IX nv1, const VERTEX3D *v1,
   for(i=0; i<nv1; im1=i++) {   /* for all edges of polygon 1 */
     VECTOR((v1+im1), (v1+i), (&A[i]));
     a[i] = VLEN((&A[i]));
-#ifdef DEBUGX
+#ifdef DEBUG
     if(a[i] < EPS) {
       error(2, __FILE__, __LINE__, "small edge (a=%6g) in ViewALI",a[i]);
     }
@@ -541,7 +541,7 @@ R8 ViewALI(const IX nv1, const VERTEX3D *v1,
     VECTOR((v2+jm1), (v2+j), (&B));
     b2 = VDOT((&B), (&B));
     b = sqrt(b2);
-#ifdef DEBUGX
+#ifdef DEBUG
     if(b < EPS) {
       error(2, __FILE__, __LINE__, "small edge (b=%6g) in ViewALI", b);
     }
@@ -552,7 +552,7 @@ R8 ViewALI(const IX nv1, const VERTEX3D *v1,
       VERTEX3D V[3];  /* vertices of edge i */
       R8 dF[3];
       IX flag1, flag2;
-      //#ifdef DEBUGX
+      //#ifdef DEBUG
       //      fprintf(_ulog, "Srf1 %d-%d (%f %f %f) to (%f %f %f)\n", i, ip1,
       //        v1[i].x, v1[i].y, v1[i].z, v1[ip1].x, v1[ip1].y, v1[ip1].z);
       //      fprintf(_ulog, "Srf2 %d-%d (%f %f %f) to (%f %f %f)\n", j, jp1,
@@ -562,7 +562,7 @@ R8 ViewALI(const IX nv1, const VERTEX3D *v1,
       if(fabs(dot) <= EPS) {
         continue;
       }
-#ifdef DEBUGX
+#ifdef DEBUG
       fprintf(_ulog, " ViewALI: j=%d i=%d b %f a %f dot %f\n",
               j, i, b, a[i], dot);
 #endif
@@ -583,7 +583,7 @@ R8 ViewALI(const IX nv1, const VERTEX3D *v1,
                          &B, b2, 0, vfCtrl) / b;
       }
       sum += dot * sumt;
-#ifdef DEBUGX
+#ifdef DEBUG
       fprintf(_ulog, "ALI: i %d j %d dot %f t %f sum %f\n",
               j, i, dot, sumt, sum);
 #endif
@@ -591,7 +591,7 @@ R8 ViewALI(const IX nv1, const VERTEX3D *v1,
   }  /* end j loop */
 
   sum *= PIt4inv;          /* divide by 4*pi */
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, "ViewALI AF: %g\n", sum);
 #endif
 
@@ -656,7 +656,7 @@ IX DivideEdges(IX nDiv, IX nVrt, VERTEX3D *Vrt, EDGEDCS *rc, EDGEDIV **dv)
   R8 s;    /* distance between vertices */
   IX i, im1, j, n;
 
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, "DIVEDGE:  nd=%d\n", nDiv);
   DumpP3D("Polygon:", nVrt, Vrt);
   //#endif
@@ -684,7 +684,7 @@ IX DivideEdges(IX nDiv, IX nVrt, VERTEX3D *Vrt, EDGEDCS *rc, EDGEDIV **dv)
     }
   }
 
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, "rc:       x            y            z            s\n");
   for(i=0; i<nVrt; i++) {
     fprintf(_ulog, "%2d %12.5f %12.5f %12.5f %12.5f\n", i,

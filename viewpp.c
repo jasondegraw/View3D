@@ -190,7 +190,7 @@ void Separate(const IX nSrf, const IX *base, R4 *area, R8 **AF)
     }
   }
 
-#ifdef DEBUGX
+#ifdef DEBUG
   for(n=1; n<=nSrf; n++) {
     fprintf(_ulog, "Area: %d %f\n", n, area[n]);
   }

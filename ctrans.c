@@ -27,11 +27,6 @@
 /*  bear some notice that they have been modified.                            */
 /*                                                                            */
 /******************************************************************************/
-#ifdef _DEBUG
-# define DEBUG 1
-#else
-# define DEBUG 1
-#endif
 #include <stdio.h>
 #include <string.h> /* prototype: memcpy */
 #include <math.h>   /* prototypes: fabs, sqrt */
@@ -119,7 +114,7 @@ void CTRotateX(const R8 cosAngle, const R8 sinAngle, R8 t[4][4])
 {
   IX j;
 
-#ifdef DEBUGX
+#ifdef DEBUG
   if(cosAngle*cosAngle + sinAngle*sinAngle - 1.0 > 2.0*FLT_EPSILON) {
     error(2, __FILE__, __LINE__, "Invalid angle in CTRotateX");
   }
@@ -147,7 +142,7 @@ void CTRotateZ(const R8 cosAngle, const R8 sinAngle, R8 t[4][4])
 {
   IX j;
 
-#ifdef DEBUGX
+#ifdef DEBUG
   if(cosAngle*cosAngle + sinAngle*sinAngle-1.0 > 2.0*FLT_EPSILON) {
     error(2, __FILE__, __LINE__, "Invalid angle in CTRotateZ");
   }
@@ -172,7 +167,7 @@ void CTRotateU(const DIRCOS *u, R8 t[4][4])
 {
   R8 v;
 
-#ifdef DEBUGX
+#ifdef DEBUG
   if(fabs(sqrt(u->x*u->x + u->y*u->y + u->z*u->z)-1.0) > 2.0*FLT_EPSILON) {
     error(2, __FILE__, __LINE__, "Invalid angle in CTRotateU");
   }
@@ -243,7 +238,7 @@ void CoordTrans3D(SRFDAT3D *srf, SRFDATNM *srf1, SRFDATNM *srf2,
   IX j, n;
 
   scale = 1.0f / srf2->rc;   /* distance scaling factor */
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, "CoordTrans3D:  %f\n", scale);
   DumpVA(" dc ", 1, 3, &srf2->dc.x);
   DumpVA(" ctd", 1, 3, &srf2->ctd.x);
@@ -255,7 +250,7 @@ void CoordTrans3D(SRFDAT3D *srf, SRFDATNM *srf1, SRFDATNM *srf2,
   CTShift((void *)&srf2->ctd, a);
   CTRotateU((void *)&srf2->dc, a);
   CTScale(scale, a);
-#ifdef DEBUGX
+#ifdef DEBUG
   DumpVA(" A", 3, 4, a[0]);
   DumpVA(" B", 3, 4, b[0]);
 #endif
@@ -315,7 +310,7 @@ void CoordTrans3D(SRFDAT3D *srf, SRFDATNM *srf1, SRFDATNM *srf2,
     srfOT->ztmax = zmax;
     /* This may never be needed for plane polygons */
     if(clip) {
-#ifdef DEBUGX
+#ifdef DEBUG
       fprintf(_ulog, " Clipping obstruction surface %d\n", srfOT->nr);
 #endif
       memcpy(vs, srfOT->v, nv*sizeof(VERTEX3D));
@@ -323,7 +318,7 @@ void CoordTrans3D(SRFDAT3D *srf, SRFDATNM *srf1, SRFDATNM *srf2,
     }
   }
 
-#ifdef DEBUGX
+#ifdef DEBUG
   Dump3X("Surface 1", srf1T);
   Dump3X("Surface 2", srf2T);
   srfOT = vfCtrl->srfOT;

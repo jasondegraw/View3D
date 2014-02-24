@@ -79,7 +79,7 @@ R8 ViewObstructed(VFCTRL *vfCtrl, IX nv1, VERTEX3D v1[], R8 area, IX nDiv)
   IX nv2, nvs, nvb;
   IX j, k, n;
 
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, "ViewObstructed:\n");
 #endif
   //#if( DEBUG > 2 )
@@ -110,7 +110,7 @@ R8 ViewObstructed(VFCTRL *vfCtrl, IX nv1, VERTEX3D v1[], R8 area, IX nDiv)
       ymax = vb[n].y;
     }
   }
-#ifdef DEBUGX
+#ifdef DEBUG
   DumpP2D("Base Surface:", nvb, vb);
   fprintf(_ulog, "limits:  %f %f   %f %f\n", xmin, xmax, ymin, ymax);
 #endif
@@ -123,7 +123,7 @@ R8 ViewObstructed(VFCTRL *vfCtrl, IX nv1, VERTEX3D v1[], R8 area, IX nDiv)
   /* compute obstructed view from each view point of polygon 1 */
   for(AFu=0.0,np=0; np<nvpt; np++) {       /* begin view points loop */
     hc = 0.9999f * vpt[np].z;
-#ifdef DEBUGX
+#ifdef DEBUG
     fprintf(_ulog, "view point: %f %f %f\n", vpt[np].x, vpt[np].y, vpt[np].z);
     fprintf(_ulog, "Hclip %g\n", hc);
     fflush(_ulog);
@@ -131,7 +131,7 @@ R8 ViewObstructed(VFCTRL *vfCtrl, IX nv1, VERTEX3D v1[], R8 area, IX nDiv)
     /* begin with cleared small structures area - memBlock */
     InitPolygonMem(epsDist, epsArea);
     stack = SetPolygonHC(nvb, vb, 1.0);  /* convert surface 2 to HC */
-#ifdef DEBUGX
+#ifdef DEBUG
     DumpHC("BASE SURFACE:", stack, NULL);
 #endif
 
@@ -140,7 +140,7 @@ R8 ViewObstructed(VFCTRL *vfCtrl, IX nv1, VERTEX3D v1[], R8 area, IX nDiv)
     for(dFv=0.0,j=0; j<vfCtrl->nProbObstr; j++,srfT++) {
       /* CTD must be behind surface */
       R8 dot = VDOTW ((vpt+np), (&srfT->dc));
-#ifdef DEBUGX
+#ifdef DEBUG
       fprintf(_ulog, "Surface %d;  dot %f\n", srfT->nr, dot);
       fflush(_ulog);
 #endif
@@ -153,12 +153,12 @@ R8 ViewObstructed(VFCTRL *vfCtrl, IX nv1, VERTEX3D v1[], R8 area, IX nDiv)
         if(zc[n] > 0.0) clip = 1;
       }
       if(clip) {       /* clip to prevent upward projection */
-#ifdef DEBUGX
+#ifdef DEBUG
         fprintf(_ulog, "Clip M;  zc: %g %g %g %g\n",
                 zc[0], zc[1], zc[2], zc[3]);
 #endif
         nvs = ClipPolygon(-1, nvs, (VERTEX3D *)&srfT->v, zc, v2);
-#ifdef DEBUGX
+#ifdef DEBUG
         if(nvs >= MAXNV2 || nvs < 0) {
           error(3, __FILE__, __LINE__,
                 "Invalid number of vertices (%d) in ViewObstructed",
@@ -169,7 +169,7 @@ R8 ViewObstructed(VFCTRL *vfCtrl, IX nv1, VERTEX3D v1[], R8 area, IX nDiv)
           continue; /* no shadow polygon created */
         }
         pv2 = v2;
-#ifdef DEBUGX
+#ifdef DEBUG
         DumpP3D("Clipped surface:", nvs, pv2);
 #endif
       } else {
@@ -183,7 +183,7 @@ R8 ViewObstructed(VFCTRL *vfCtrl, IX nv1, VERTEX3D v1[], R8 area, IX nDiv)
         vs[n].y = vpt[np].y - temp * (vpt[np].y - pv2->y);
       }
       /* limit projected surface; avoid some HC problems */
-#ifdef DEBUGX
+#ifdef DEBUG
       if(nvs >= MAXNV2 || nvs < 0) {
         error(3, __FILE__, __LINE__,
               "Invalid number of vertices (%d) in ViewObstructed",
@@ -194,7 +194,7 @@ R8 ViewObstructed(VFCTRL *vfCtrl, IX nv1, VERTEX3D v1[], R8 area, IX nDiv)
       if(nvs < 3) {
         continue; /* no shadow polygon created */
       }
-#ifdef DEBUGX
+#ifdef DEBUG
       /* bounds check on projected surface */
       {
         R8 temp = 0.0;
@@ -215,7 +215,7 @@ R8 ViewObstructed(VFCTRL *vfCtrl, IX nv1, VERTEX3D v1[], R8 area, IX nDiv)
       NewPolygonStack();
       shade = SetPolygonHC(nvs, vs, 0.0);
       if(shade) {
-#ifdef DEBUGX
+#ifdef DEBUG
         DumpHC("SHADOW:", shade, NULL);
 #endif
 
@@ -238,7 +238,7 @@ R8 ViewObstructed(VFCTRL *vfCtrl, IX nv1, VERTEX3D v1[], R8 area, IX nDiv)
         if(stack==NULL) {            /* no new unshaded polygons; so */
           break;                     /* polygon 2 is totally obstructed. */
         }
-#ifdef DEBUGX
+#ifdef DEBUG
         DumpHC("UNSHADED:", stack, NULL);
 #endif
         FreePolygons(shade, NULL); /* free the shadow polygon */
@@ -253,14 +253,14 @@ R8 ViewObstructed(VFCTRL *vfCtrl, IX nv1, VERTEX3D v1[], R8 area, IX nDiv)
     for(pp=stack; pp; pp=pp->next) {
       vfCtrl->totPoly += 1;
       nv2 = GetPolygonVrt3D(pp, v2);
-#ifdef DEBUGX
+#ifdef DEBUG
       DumpP3D("Unshaded surface:", nv2, v2);
 #endif
       dF = V1AIpart(nv2, v2, vpt+np, dc1);
-#ifdef DEBUGX
+#ifdef DEBUG
       fprintf(_ulog, " Partial view factor: %g\n", dF);
 #endif
-#ifdef DEBUGX
+#ifdef DEBUG
       if(dF < 0.0) {
         if(dF < -1.0e-16) {
           error(1, __FILE__, __LINE__,
@@ -279,14 +279,14 @@ R8 ViewObstructed(VFCTRL *vfCtrl, IX nv1, VERTEX3D v1[], R8 area, IX nDiv)
       dFv += dF;
     }
 
-#ifdef DEBUGX
+#ifdef DEBUG
     fprintf(_ulog, " SS: x %f, y %f, z %f, dFv %g\n",
             vpt[np].x, vpt[np].y, vpt[np].z, dFv);
 #endif
     AFu += dFv * weight[np];
   }  /* end of view points (np) loop */
 
-#ifdef DEBUGX
+#ifdef DEBUG
   if(AFu < 0.0) { /* due to negative weight; enly np=0 */
     if(weight[0] > 0) {
       //if( AFu < -1.0e-11 )
@@ -297,7 +297,7 @@ R8 ViewObstructed(VFCTRL *vfCtrl, IX nv1, VERTEX3D v1[], R8 area, IX nDiv)
   }
 #endif
 
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, "v_obst_u AF:  %g\n", AFu);
   fflush(_ulog);
 #endif
@@ -411,7 +411,7 @@ IX Subsurface(SRFDAT3X *srf, SRFDAT3X sub[])
         obtuse += k;
       }
     }
-#ifdef DEBUGX
+#ifdef DEBUG
     for(j=0; j<4; j++) {
       fprintf(_ulog, " edge %d: (%f %f %f) L %f, C %f (%.3f deg)\n", j+1,
               edge[j].x, edge[j].y, edge[j].z,
@@ -709,7 +709,7 @@ R8 ViewTP(VERTEX3D v1[], R8 area, IX level, VFCTRL *vfCtrl)
       SubsrfTS(n, v1, vt);       /* and compute AF for each subsurface and sum. */
       dF = ViewTP(vt, 0.25f*area, level, vfCtrl);
       AF += dF;
-#ifdef DEBUGX
+#ifdef DEBUG
       fprintf(_ulog, "  ViewTP (%d) AF: %d (%f) %f\n", level, n, dF, AF);
 #endif
     }
@@ -783,7 +783,7 @@ R8 ViewRP(VERTEX3D v1[], R8 area, IX level, VFCTRL *vfCtrl)
       SubsrfRS(n, v1, vt);       /* and compute AF for each subsurface and sum. */
       dF = ViewRP(vt, 0.25f*area, level, vfCtrl);
       AF += dF;
-#ifdef DEBUGX
+#ifdef DEBUG
       fprintf(_ulog, "  ViewRP (%d) AF: %d (%f) %f\n", level, n, dF, AF);
 #endif
     }

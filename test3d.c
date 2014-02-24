@@ -142,7 +142,7 @@ IX BoxTest(SRFDAT3D *srf, SRFDATNM *srfN, SRFDATNM *srfM,
   IX i, k;   /* surface number */
   IX nPoss;  /* number of possible obstructing surfaces */
 
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, "BoxTest: %d\n", nPossObstr);
 #endif
   xmax = xmin = srfN->v[0].x;
@@ -285,7 +285,7 @@ IX ConeRadiusTest(SRFDAT3D *srf, SRFDATNM *srfN, SRFDATNM *srfM,
   IX i, k;   /* surface number */
   IX nPoss=0;  /* number of possible obstructing surfaces */
 
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, "ConeRadiusTest: %d\n", nPossObstr);
 #endif
 
@@ -306,7 +306,7 @@ IX ConeRadiusTest(SRFDAT3D *srf, SRFDATNM *srfN, SRFDATNM *srfM,
   if(mode) {
     if(distNM<radLarge) mode = 0;
   }
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, "mode %d;  distNM %f;  dcNM %f %f %f\n",
           mode, distNM, dcNM.x, dcNM.y, dcNM.z);
 #endif
@@ -321,20 +321,20 @@ IX ConeRadiusTest(SRFDAT3D *srf, SRFDATNM *srfN, SRFDATNM *srfM,
     } else {
       VSHIFT((&srfN->ctd), e, (&a), (&apex));
     }
-#ifdef DEBUGX
+#ifdef DEBUG
     fprintf(_ulog, "Cone: %f %f %f %f  %f %f %f\n",
             radSmall, radLarge, distSmall, distLarge, apex.x, apex.y, apex.z);
 #endif
   } else {
     radCylndr = MAX(srfN->rc, srfM->rc);
-#ifdef DEBUGX
+#ifdef DEBUG
     fprintf(_ulog, "Cylinder: %f\n", radCylndr);
 #endif
   }
   /* process possible view obstructing surfaces */
   for(i=1; i<=nPossObstr; i++) {
     k = possibleObstr[i];
-#ifdef DEBUGX
+#ifdef DEBUG
     fprintf(_ulog, "K: %d\n", k);
 #endif
     if(mode) {                    /* cone radius test */
@@ -353,7 +353,7 @@ IX ConeRadiusTest(SRFDAT3D *srf, SRFDATNM *srfN, SRFDATNM *srfM,
         continue;
       }
     }
-#ifdef DEBUGX
+#ifdef DEBUG
     fprintf(_ulog, "Passed radius test\n");
 #endif
     /* K may be an obstruction */
@@ -389,7 +389,7 @@ IX OrientationTest(SRFDAT3D *srf, SRFDATNM *srfN, SRFDATNM *srfM,
   IX i, k;    /* surface number */
   IX nPoss;   /* number of possible obstructing surfaces */
 
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, "OrientationTest: %d\n", nPossObstr);
 #endif
   if(srfN->rc < srfM->rc) {
@@ -402,7 +402,7 @@ IX OrientationTest(SRFDAT3D *srf, SRFDATNM *srfN, SRFDATNM *srfM,
   /* process possible view obstructing surfaces */
   for(nPoss=0,i=1; i<=nPossObstr; i++) {
     k = possibleObstr[i];
-#ifdef DEBUGX
+#ifdef DEBUG
     fprintf(_ulog, "K: %d\n", k);
 #endif
     nv = srf[k].nv;
@@ -416,7 +416,7 @@ IX OrientationTest(SRFDAT3D *srf, SRFDATNM *srfN, SRFDATNM *srfM,
     if(n==nv) {
       continue;
     }
-#ifdef DEBUGX
+#ifdef DEBUG
     fprintf(_ulog, "K in front of srfM\n");
 #endif
 
@@ -441,7 +441,7 @@ IX OrientationTest(SRFDAT3D *srf, SRFDATNM *srfN, SRFDATNM *srfM,
     if(infront + behind == 0) {
       continue;   /* coplanar surfaces */
     }
-#ifdef DEBUGX
+#ifdef DEBUG
     fprintf(_ulog, "NrelS %d, MrelS %d\n", srf[k].NrelS, srf[k].MrelS);
 #endif
     /* no obstruction if N & M in front of K */
@@ -479,7 +479,7 @@ IX OrientationTestN(SRFDAT3D *srf, IX N, VFCTRL *vfCtrl,
   IX nPoss;   /* number of possible obstructing surfaces */
   R8 eps = 1.0e-5 * srf[N].rc;
 
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, "OrientationTestN: %d\n", nPossObstr);
 #endif
 
@@ -686,7 +686,7 @@ void IntersectionTest(SRFDATNM *srfN, SRFDATNM *srfM)
   eps1 = 1.0f + eps;
   pv12 = &v12; pv13 = &v13; pv23 = &v23;
   nVrtN = srfN->nv; nVrtM = srfM->nv;
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, "IntersectionTest: %d %d\n", srfN->nr, srfM->nr);
   DumpP3D("srfN", nVrtN, srfN->v);
   DumpP3D("srfM", nVrtM, srfM->v);
@@ -752,7 +752,7 @@ void IntersectionTest(SRFDATNM *srfN, SRFDATNM *srfM)
 
   if(nip>1) {
     error(1, __FILE__, __LINE__, "Surfaces may intersect in IntersectionTest");
-#ifdef DEBUGX
+#ifdef DEBUG
     sprintf(_string, "Surface %d:", srfN->nr);
     DumpP3D(_string, nVrtN, srfN->v);
     sprintf(_string, "Surface %d:", srfM->nr);
@@ -877,7 +877,7 @@ IX CylinderRadiusTest(SRFDAT3D *srf, SRFDATNM *srfN, SRFDATNM *srfM,
   IX i, k;     /* surface number */
   IX nPoss=0;  /* reduced number of possible obstructing surfaces */
 
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, "CylinderRadiusTest: %d\n", nPossObstr);
 #endif
 
@@ -886,14 +886,14 @@ IX CylinderRadiusTest(SRFDAT3D *srf, SRFDATNM *srfN, SRFDATNM *srfM,
   VSCALE(d, (&a), (&dcNM));
 
   radCylndr = MAX(srfN->rc, srfM->rc);
-#ifdef DEBUGX
+#ifdef DEBUG
   fprintf(_ulog, "Cylinder: %f\n", radCylndr);
 #endif
 
   /* process possible view obstructing surfaces */
   for(i=1; i<=nPossObstr; i++) {
     k = possibleObstr[i];
-#ifdef DEBUGX
+#ifdef DEBUG
     fprintf(_ulog, "K: %d\n", k);
 #endif
     VECTOR((&srfN->ctd), (&srf[k].ctd), (&a));
@@ -902,14 +902,14 @@ IX CylinderRadiusTest(SRFDAT3D *srf, SRFDATNM *srfN, SRFDATNM *srfM,
     if(VDOT((&b),(&b)) > (d*d)) {
       continue;
     }
-#ifdef DEBUGX
+#ifdef DEBUG
     fprintf(_ulog, "Passed radius test\n");
 #endif
     /* K may be an obstruction */
     possibleObstr[++nPoss] = k;
   }
 
-#ifdef DEBUGX
+#ifdef DEBUG
   if(nPoss && _list>3) {
     DumpOS("CylinderRadiusTest LOS:", nPoss, possibleObstr);
   }
