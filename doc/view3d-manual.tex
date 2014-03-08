@@ -1,0 +1,559 @@
+\documentclass[10pt]{article}
+\usepackage{amsmath}
+\usepackage{mathptmx}
+\usepackage{graphicx,color}
+\usepackage[margin=1in]{geometry}
+\usepackage[all]{xy}
+\usepackage{nameref}
+\usepackage[colorlinks=true,linkcolor=linkblue]{hyperref}
+\definecolor{linkblue}{rgb}{0,0,1}
+\usepackage{fancyvrb}
+\CustomVerbatimEnvironment{commandline}{Verbatim}{xleftmargin=5mm}
+\CustomVerbatimEnvironment{vs3file}{Verbatim}{xleftmargin=5mm}
+\CustomVerbatimEnvironment{results}{Verbatim}{xleftmargin=5mm}
+\begin{document}
+\begin{titlepage}
+\begin{center}
+\begin{Huge}
+View3D User Manual\\
+\end{Huge}
+\vspace{1cm}
+\begin{Large}
+Version 3.3, Revision 3\\
+\end{Large}
+\vspace{1cm}
+\begin{Large}
+\today
+\end{Large}
+\end{center}
+\end{titlepage}
+\section{Background}
+This document provides a brief description of use of the View3D 3.3 program for
+computing view factors of 3-dimensional geometries described in terms of simple
+planar polygons – triangles and convex quadrilaterals. It is an extension of
+previous work. The algorithms use improved integration and geometric methods 
+with special emphasis on the processing of view obstructions. 
+
+The earlier VLITE program [2] attempted to predict the subdivisions necessary
+for the view factor numerical integrations, but this process would occasionally
+leave relatively large errors in some of the computed values. There was a major
+algorithm revision (3.1) involving adaptive integration in March 1999.  The new
+program uses adaptive integration to control the calculation to approximately 
+the same level of accuracy for all view factors. Once the view factors are
+computed several post-processing operations are executed to combine or separate
+surfaces, include the effect of surface emissivity (Hottel's ``script-F'' view
+factors or ``total interchange areas'' [3]), and slightly adjust the view 
+factors to guarantee conservation of energy when they are used for an enclosure.
+
+It is intended that the algorithms eventually become part of more general heat
+transfer programs. The source code is in standard C, which should allow
+recompilation for almost any operating system. It should also be relatively 
+easy to modify the program to make it a subroutine called from other programs.
+
+\noindent
+\textbf{History:}\\
+View3D 1.0 -- 1986 -- first program\\
+View3D 2.0 -- 1991 -- called VLITE for use with HLITE; conversion from
+Fortran to C\\
+View3D 3.0 -- 1996 -- search for accurate view factors; split into multiple
+programs\\
+View3D 3.1 -- 1999 -- adaptive integration – see NISTIR 6925\\
+View3D 3.2 -- 2002 -- new controls input for compatibility with anticipated
+version 4.0\\
+
+\section{Getting View3D}
+\subsection{License}
+View3D was written while George Walton was employed at NIST, so the program is
+in the public domain with the following disclaimer:
+\begin{quotation}
+\noindent
+This software was developed at the National Institute of Standards and 
+Technology by employees of the Federal Government in the course of their 
+official duties.  Pursuant to title 17 Section 105 of the United States Code 
+this software is not subject to copyright protection and is in the public 
+domain. These programs are experimental systems. NIST assumes no responsibility
+whatsoever for their use by other parties, and makes no guarantees, expressed 
+or implied, about its quality, reliability, or any other characteristic.   We
+would appreciate acknowledgement if the software is used. This software can be
+redistributed and/or modified freely provided that any derivative works bear
+some notice that they are derived from it, and any modified versions bear some
+notice that they have been modified.
+\end{quotation}
+\noindent
+Please consider placing modified versions in the public domain or available
+under an open source license.
+\subsection{System Requirements}
+The View3D program is a command line tool written in standard C, and is known
+to compile on a number of different systems.  Because of differences between
+compilers, some system-specific modifications are required.  Further
+information is available in the source distribution. The program has been
+implemented without a graphic user interface because its only purpose is to
+test the computational algorithms.  Most modern desktop or laptop systems
+should have sufficient memory and processor power to run the program.
+
+\subsection{Installation}
+Installation files may be provided for some systems in the future, but no
+installation is required on most systems once it has been compiled. Compilation
+instructions are provided in the source distribution.
+
+\section{Using View3D}
+All input and output is through simple ASCII text files. For a reminder of the
+sequence of file names on the program command line just enter the program name
+followed by a space and then a question mark:
+
+\begin{commandline}
+View3D ?
+\end{commandline}
+
+\noindent
+To computes view factors for a three-dimensional geometry, the usage is: 
+
+\begin{commandline}
+View3D <input> <output>
+\end{commandline}
+
+\noindent
+where \verb|<input>| is the name of the 3-D vertex and surface data file (see
+section 5) and \verb|<output>| is the name of the view factor output file (see
+section 6).  The filenames may also be entered interactively.  If one or both
+of the filenames is missing, the user is prompted to input the required 
+file(s).
+
+\section{View3D Surfaces}
+View3D directly supports convex planar quadrilaterals and planar triangles. 
+Nonconvex planar polygons and polygons with more than four vertices are
+supported indirectly: the user must first decompose the polygon into a set of
+convex quadrilaterals and triangles, which are combined in a postprocessing
+step by the program.  Additionally, a number of different embedded surfaces, or
+surfaces that are contained (in the same plane and inside the parent polygon)
+within a parent or base surface, are supported.   There are a number of 
+different fundamental surface types, and each of these types is modified
+depending upon whether the surface is to be combined with other surfaces,
+whether the surface is base of other surfaces, and whether it is the subsurface
+of another surface.
+
+\subsection{Surface Types}
+There are five fundamental surface types:
+\begin{enumerate}
+\item Conventional surface radiating to other surfaces – These are the most
+basic surfaces that are to have view factors calculated.  Each surface has an
+active and an inactive side.  The orientation of the surface is determined by
+application of the right-hand rule to the vertices that define the surface.
+The active side is the positive side according to the right-hand rule.
+\item Conventional subsurface radiating to other surfaces – These surfaces are
+the most basic subsurface.  As with the conventional surface, each subsurface
+has an active and inactive side.  A subsurface interacts radiatively with other
+surfaces except the base surface, and may be used to represents situations such
+as a window in a wall.  View factors between the base and other surfaces are
+reduced by the subsurface values during postprocessing.  The base of a
+subsurface may also be a subsurface.  The following restrictions apply:
+\begin{enumerate}
+   \item The subsurface must lie in the plane of its base surface.
+   \item The subsurface must face in the same direction as its base surface.
+   \item The subsurface must be entirely within its base surface.
+   \item The subsurface must be numbered after its base.
+\end{enumerate}
+\item Masking surface – A masking surface is much like a subsurface except that
+it faces toward the base thereby blocking the view from the masked portion of
+the base to other surfaces. The view factor from the mask to the base is 1. 
+Masking surfaces are subject to the following restrictions:
+\begin{enumerate}
+   \item The masking surface must lie in the plane of its base surface.
+   \item The masking surface must face in the opposite direction as its base
+   surface.
+   \item The masking surface must lie entirely within its base surface.
+   \item The masking surface must have a conventional surface or subsurface as
+   its base surface.
+\end{enumerate}
+\item Null surface – A null surface is a special type of masking surface that
+nullifies the covered portion of the base surface. The null surface is removed
+from the matrix of radiating surfaces, and the area of the base surface is
+reduced by the area of the null surface during post-processing.  Null surfaces
+are subject to the same restrictions as masking surfaces.
+\item Non-radiating, view obstructing surface – An obstruction surface may
+block the view between radiating surfaces but there is no view factor computed
+between it and the radiating surfaces.  As with conventional surfaces, these
+surfaces have an active and inactive side.  Obstruction surfaces are allowed to
+have regular subsurfaces that will participate as a radiating surfaces.  The
+purpose of this arrangement it to simplify the view obstruction calculation
+when several surfaces can be grouped as a single view obstructing surface.
+\end{enumerate}
+
+\subsection{Surface Combination}
+Surface combination allows several surfaces to be combined into a single
+surface in the final view factors. This is necessary for describing a
+non-convex surface to View3D.  The view factors for surfaces that are to be
+combined are calculated separately and then combined using view factor algebra.
+For example, the wall around a window could be described as four rectangles
+which will be combined during post-processing.  Combination reduces the number
+of surfaces and causes a renumbering of the surfaces, so the reported number of
+view factors will not match the input number of surfaces.  When combining more
+than two surfaces, View3D requires that all of the surfaces be combined with
+one surface.  Further information is available below in the format specific
+documentation.
+
+\section{Input File Format}
+The input file for View3D is an ASCII text file with data entries (often one
+per line) that describe the case to be calculated.  The extension ``vs3'' is
+usually used for these input files, but this not required.  Each line of a
+data file contains specific information in a specific order.
+\subsection{Input Data Elements}\label{dataels}
+Each entry begins with a single character to specify the kind of element.  The
+entries making up an element are generally separated by one or more blanks.
+Not all elements are required, and the interpretation of some elements depends
+on other elements (most particularly the F element).
+
+\begin{itemize}
+\item\textbf{(! /)} A `!' or `/' begins a comment which reports information
+to the user but is not read by the program. Use comments to document special
+features described by the input file. A comment may also begin after the data
+on a line.
+
+\item\textbf{(T t)} A `T' or `t' indicates a title. The remaining information
+on this line is transferred to all intermediate files and is echoed in all view
+factor reports. This is usually the first line of the input file. If there are
+multiple title lines, only the contents of the last will be echoed.
+
+\item\textbf{(* E e)} A `*' or `E' or `e' indicates end-of-information which
+terminates reading the input file. Any information on the file after this line
+will not be read. This allows you to store additional information, such as
+different geometric descriptions, at the end of the input file.
+
+\item\textbf{(C c)} The control line specifies white space separated parameters
+as name = value pairs.  Any of the following parameters may be included in any
+order. For each parameter, the default value is shown in parentheses.
+\begin{itemize}
+\item\textbf{eps (1.0e-4):} integration convergence criterion for both adaptive
+integration and view obstruction calculations.  This is not an exact measure of
+the accuracy of the computed view factors, but smaller values will usually lead
+to more precise values. The convergence criteria should not be less than about
+1.0e-6 because many of the intermediate calculations are accurate only to single
+(32-bit) precision.
+\item\textbf{maxU (12):} maximum recursions used in computing the unobstructed
+view factors.
+\item\textbf{maxO (8):} maximum recursions used in computing the obstructed
+view factors. Limiting the maximum number of recursions limits the total
+execution time of the program but may prevent reaching the specified
+convergence.
+\item\textbf{minO (0):} minimum recursions used in computing the obstructed
+view factors. This can help in cases where an obstruction occurs very near the
+view between the edges of two surfaces. The normal adaptive integration may
+miss the obstruction. Increasing this value from its normal value of 0 to 1 
+or 2 may catch the obstruction. This is probably not necessary except when very
+accurate view factors are desired. It can add considerably to execution time.
+\item\textbf{row (0):} selected row for computing view factors (0 = all rows)
+\item\textbf{col (0):} selected column for computing view factors (0 = all
+columns)
+\item\textbf{encl (0):} 1 indicates that the surfaces form an enclosure; 0
+indicates that they do not. This data is used to adjust the view factors of an
+enclosure to guarantee conservation of energy.
+\item\textbf{emit (0):} 1 indicates that diffuse reflectance effects will be
+included in the computed view factors (Hottel’s “script-F” view factors); 0
+indicates they will not, i.e., surfaces will be considered 'black'.
+\item\textbf{out (0):} view factor output file format - 1 = simple text file, 
+0 = binary file.
+\item\textbf{list (0):} computational summary written to the View3D.log file - 
+0 gives minimal information; 1 gives slightly more; 2 prints all the view
+factors; 3 causes dumping of some intermediate values.
+\end{itemize}
+
+\item\textbf{(F f)} Most of the input file is devoted to describing the
+geometry of the surfaces plus some related surface data.  There are several
+ways to describing surface geometry. The geometry line indicates the type of
+geometry being described by the rest of the input file. It consists of a `F'
+or `f' followed by a single parameter: 3, or 3a (2 is reserved for a 2-D
+geometry processed by another program and 1 is reserved for a ``1-D'' geometry
+using only surface areas for “very approximate” view factors).
+
+
+\item\textbf{(V v)} A `V' or `v' indicates a line that describes a vertex.  The
+character is followed by a vertex number (a positive integer greater than 0)
+and two floating point coordinate values.  This data element is only used for
+F=3.  Vertices should be specified in order, as in this example:
+
+\begin{vs3file}
+!  #   x    y    z      coordinates of vertices
+V  1   0.   0.   0.
+V  2   1.   0.   0.
+V  3   1.   1.   0.
+V  4   0.   1.   0.
+\end{vs3file}
+
+\item\textbf{(S s) (M m) (N n) (O o)} Each line beginning with one of these
+characters is a surface to be used in the view factor calculation.  The format
+of the data depends upon the value of the F element.  See \ref{Feq3} and 
+\ref{Feq3a} for details.
+\end{itemize}
+
+\subsection{View3D Format (F=3)}\label{Feq3}
+This format specifies vertices and surfaces separately.  Control elements are
+specified first, then vertices, followed by surfaces.  Each surface is
+specified by a surface number (a positive integer greater than one), four
+vertex numbers, a base surface number, a combination surface number, an
+emissivity, and a surface name.  Surfaces should also be specified in order,
+as in the following example:
+
+\begin{vs3file}
+!  #   v1  v2  v3  v4 base cmb  emit  name
+S  1    1   2   3   4   0   0   0.50  zeq0
+S  2    1   4   8   5   0   0   0.50  xeq0
+\end{vs3file}
+
+The vertex pointers are the numbers of the previously defined vertices listed 
+in counter-clockwise sequence as viewed from the front of the surface. If the
+surface is a triangle, the fourth vertex number should be zero. Quadrilateral
+surfaces must be convex, i.e. no interior angle greater than 180 degrees.  The
+base surface number associates a surface with another surface as a subsurface
+of the other subsurface.  In the above example, neither surface is a subsurface
+(base = 0).  Subsurfaces should always be specified after the base surface.
+The combination surface number (the ``cmb'' column above) specifies that
+surfaces are to be combined at the output step.  A non-zero value indicates the
+number of the surface with which this surface is combined.  The combination
+surface number should always refer to a previously defined surface.  When
+combining more than two surfaces, combine all the higher numbered surfaces
+with the lowest numbered surface (do not ``chain'' combinations).  The surface
+emissivity allows for the modeling of ``gray'' reflection from non-black
+surfaces. The values may range between 0.01 (very reflective) and 0.99 (near
+black).  The surface name helps to identify surfaces in the reports. A name 
+may have no embedded blanks; use `\verb|_|', `\verb|-|', or selective
+capitalization instead of blanks.
+
+\begin{vs3file}
+Example of a F=3 input file:
+T  Pinney & Bean test 4: L shaped room (page A2.14; Table A2.11) BRE
+! encl list  epsu  epso  maxu maxo mino emit
+C  encl=1 list=2 eps=1.e-4 maxu=8 maxo=8 mino=0 emit=1
+F  3
+!  #   x    y    z      coordinates of vertices
+V  1   0.   3.   3.
+V  2   1.   3.   3.
+V  3   0.   3.   0.
+V  4   1.   3.   0.
+V  5   0.   1.   0.
+V  6   1.   1.   0.
+V  7   3.   1.   0.
+V  8   0.   0.   0.
+V  9   1.   0.   0.
+V 10   3.   0.   0.
+V 11   0.   0.   3.
+V 12   1.   0.   3.
+V 13   3.   0.   3.
+V 14   0.   1.   3.
+V 15   1.   1.   3.
+V 16   3.   1.   3.
+!  #   v1  v2  v3  v4 base cmb  emit  name      surface data
+S  1   11  13  10   8   0   0   0.90  srf-1
+S  2   10  13  16   7   0   0   0.90  srf-2
+S  3    6   7  16  15   0   0   0.90  srf-3
+S  4    4   6  15   2   0   0   0.90  srf-4
+S  5    3   4   2   1   0   0   0.90  srf-5
+S  6    8   3   1  11   0   0   0.90  srf-6
+S  7   11  14  15  12   0   0   0.90  srf-7
+S  8    8   9   6   5   0   0   0.90  srf-8
+S  9    1   2  15  14   0   7   0.90  srf-7b    ! surfaces that combine
+S 10   15  16  13  12   0   7   0.90  srf-7c
+S 11    5   6   4   3   0   8   0.90  srf-8b
+S 12    9  10   7   6   0   8   0.90  srf-8c
+End of data
+\end{vs3file}
+
+\subsection{Blast Surface Format (F=3a)}\label{Feq3a}
+This format specifies vertices and surfaces simultaneously, and specifies more
+information about the surface shape.  As with the F=3 format, control elements
+are specified first followed by surfaces.  Each surface is then described by
+two or three lines of data which fully describe the surface and its vertices.
+
+The first line is similar to the surface lines described above except that
+instead of four vertex pointers there is a shape indicator: R for a rectangle,
+Q for a general quadrilateral, and T for a triangle.  The data sequence is:
+surface type (S, M, N, or O), surface shape (R, Q or T), a possible base
+surface number, a possible surface combination number, the emissivity of the
+surface, and the surface name. The surfaces must be numbered in order beginning
+at 1.  The second line will include the 3-D coordinates (X, Y, Z) of the origin
+a plane containing the surface, the azimuth angle (clockwise from the Y axis -
+north) of that plane, and its tilt angle (vertical = 90, facing flat upward = 0,
+flat downward = 180).  The remainder of data depends upon the surface type, 
+as in this example:
+
+\begin{vs3file}
+!  #  s base cmb emit  name
+S  1  R   0   0  0.90  srf-1
+  3. 0. 0.    0  90    3. 3.
+\end{vs3file}
+
+A rectangle (shape = R) is described by its width and height.  The origin
+coordinates refer to the lower left corner of the rectangle as viewed from the
+'front' or active side.  The above example is a 3 by 4 square.  The vertices of
+a quadrilateral (or triangle) is described by four (or 3) sets of (X, Y)
+coordinates relative to the origin of the plane.  These additional data values
+may be placed upon a separate line.
+
+\begin{vs3file}
+Example of a F=3a input file:
+T Pinney & Bean test 4: L shaped room (page A2.14; Table A2.11) BRE
+C  encl=1 list=2 eps=1.e-5
+F  3a
+!  #  s base cmb emit  name
+S  1  R   0   0  0.90  srf-1
+  3. 0. 0.    0  90    3. 3.
+S  2  R   0   0  0.90  srf-2
+  3. 1. 0.  270  90    1. 3.
+S  3  r   0   0  0.90  srf-3
+  1. 1. 0.  180  90    2. 3.
+S  4  R   0   0  0.90  srf-4
+  1. 3. 0.  270  90    2. 3.
+S  5  R   0   0  0.90  srf-5
+  0. 3. 0.  180  90    1. 3.
+S  6  R   0   0  0.90  srf-6
+  0. 0. 0.   90  90    3. 3.
+S  7  Q   0   0  0.90  srf-7
+  3. 0. 3.    0  180 
+  2. 0.   3. 0.   3. 1.   2. 1.
+S  8  Q   0   0  0.90  srf-8
+  0. 0. 0.  180   0 
+  0. 0.   1. 0.   1. 1.   0. 1.
+S  9  Q   0   7  0.90  srf-7b
+  3. 0. 3.    0  180 
+  2. 1.   3. 1.   3. 3.   2. 3.
+S 10  Q   0   7  0.90  srf-7c
+  3. 0. 3.    0  180 
+  0. 0.   2. 0.   2. 1.   0. 1.
+S 11  Q   0   8  0.90  srf-8b
+  0. 0. 0.  180.  0.
+  0. 1.   1. 1.   1. 3.   0. 3.
+S 12  q   0   8  0.90  srf-8c
+  0. 0. 0.  180.  0.
+  1. 0.   3. 0.   3. 1.   1. 1.
+End of data
+\end{vs3file}
+
+\section{Program Output}
+View3D writes data in three forms: general status information to the standard
+output, more detailed status information to a log file, and final view factors
+to an output file.  The output to the standard output is self-explanatory and
+not very detailed, so is not covered here.  Both the log file and output file
+contain more information.  For demonstration purposes, the view factors for a
+simple cube with unity side lengths is computed.
+
+\begin{vs3file}
+Input file for a cube:
+T A simple cube
+C encl=1 list=3
+F 3
+!  #   x    y    z      coordinates of vertices
+V  1   0.   0.   0.
+V  2   1.   0.   0.
+V  3   1.   1.   0.
+V  4   0.   1.   0.
+V  5   0.   0.   1.
+V  6   1.   0.   1.
+V  7   1.   1.   1.
+V  8   0.   1.   1.
+!  #   v1  v2  v3  v4 base cmb  emit  name      surface data
+S  1    1   2   3   4   0   0   0.50  zeq0
+S  2    1   4   8   5   0   0   0.50  xeq0
+S  3    1   5   6   2   0   0   0.50  yeq0
+S  4    7   6   5   8   0   0   0.50  zeq1
+S  5    7   3   2   6   0   0   0.50  xeq1
+S  6    7   8   4   3   0   0   0.50  yeq1
+End of data
+\end{vs3file}
+
+\subsection{View Factor Output File}
+The first line of the output file contains a header that provides information
+on the case that has been processed:
+
+\begin{results}
+View3D version out encl emit N
+\end{results}
+
+\noindent
+The version entry is the version of View3D that was used, N is the number of
+surfaces described in this file, and the remainder are the control parameters
+of the same names.  It is important to note that if surface combination has
+been requested, then the surface count reported here will not be the same as
+the number of input surfaces.  
+
+The second line lists the surface areas in order for each output surface.  
+Again, if surface combinations have taken place, then the areas of the surfaces
+reported will reflect the combinations.
+
+The next N lines (for N surfaces) are a square matrix of view factors.  If
+emittances have not been included (emit=0, which is the default), then the
+diagonal of this matrix will be zero.  If emittances have been included 
+(emit=1), then the output matrix contains Hottel’s ``script-F'' view factors
+[3]. These factors may be used with the ViewHT program to solve the heat
+transfer problem.  The view factors are arranged logically: the view factor
+ between surface $m$ and surface $n$ is entry $n$ in row $m$.
+
+The final line of the file lists the surface emittances, again in order and
+again reflecting any combinations of surfaces.
+
+The complete output file for the cube case is given below.  Note that in this
+case the view factor matrix is symmetric.  
+
+\begin{results}
+Example output file:
+View3D 3.3.1 0 1 0 6          
+1 1 1 1 1 1
+0.000000 0.200044 0.200044 0.199825 0.200044 0.200044
+0.200044 0.000000 0.200044 0.200044 0.199825 0.200044
+0.200044 0.200044 0.000000 0.200044 0.200044 0.199825
+0.199825 0.200044 0.200044 0.000000 0.200044 0.200044
+0.200044 0.199825 0.200044 0.200044 0.000000 0.200044
+0.200044 0.200044 0.199825 0.200044 0.200044 0.000000
+0.500 0.500 0.500 0.500 0.500 0.500
+\end{results}
+
+These results are easy to verify.  Formulas for the view factor between
+opposite sides of the cube are available (e.g. Equation 2-30 in [3]), gives
+
+\begin{displaymath}
+F_{14}=0.199824896.
+\end{displaymath}
+
+The remaining factors for surface 1 may be computed with view factor algebra.
+Since the cube is an enclosure, the factors for surface 1 must sum to one.
+The factors for all the faces perpendicular faces must be the same by symmetry,
+so
+
+\begin{displaymath}
+F_{12}=F_{13}=F_{15}=F_{16}=\frac{1}{4}(1-F_{14})=0.200043776.
+\end{displaymath}
+
+\noindent
+These results agree with the View3D calculations.
+
+\subsection{View3D Log File}
+A log file (View3D.log) is produced whenever View3D is run. This file is
+written in the directory containing the executable.  It provides information
+on the calculation of the view factors.  The input is summarized and the
+progress of the calculation is updated.  The extent of the data that is written
+is determined by the list input element described in section \ref{dataels} above.
+
+\section{References}
+[1] Walton, G.N., ``Algorithms for Calculating Radiation View Factors Between
+Plane Convex Polygons with Obstructions'', National Bureau of Standards NBSIR
+86-3463, Gaithersburg MD (1986)
+
+\noindent
+[2] Walton, G.N., ``Computer Programs for Simulation of Lighting/HVAC
+Interactions'', National Institute of Standards and Technology NISTIR 5322,
+Gaithersburg MD (1993)
+
+\noindent
+[3] Hottel, H.C. and A.F. Sarofim, Radiative Transfer, McGraw Hill, New York 
+NY (1967)
+
+\noindent
+[4] Pinney, A.A. \& M.W. Bean, ``A Set of Analytic Tests for Internal Longwave
+Radiation and View Factor Calculations'', Vol II, An investigation into 
+Analytical and Empirical Validation Techniques for Dynamic Thermal Models of
+Buildings, BRE, Garston, Watford, WD2 7JR, UK (1988)
+
+\noindent
+[5] Shapiro, A.B., ``FACET – A Radiation View Factor Computer Code for
+Axisymmetric, 2D Planar, and 3D Geometries with Shadowing'', University of
+California, Lawrence Livermore National Laboratory, UCID-19887 (1983)
+
+\end{document}
