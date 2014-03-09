@@ -290,8 +290,7 @@ R8 View1LI(const IX nd1, const IX nv1, const EDGEDCS *rc1, EDGEDIV **dv1,
 
   /* for all edges of polygon 2 */
   jm1 = nv2 - 1;
-  for(sum=0.0,j=0; j<nv2; jm1=j++)
-  {
+  for(sum=0.0,j=0; j<nv2; jm1=j++) {
     VECTOR3D B;   /* edge of polygon 2 */
     R8 b2;        /* length of edge squared */
     R8 b, binv;   /* length of edge and its inverse */
