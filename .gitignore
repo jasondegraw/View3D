@@ -1,3 +1,6 @@
+# Build subdirectory
+build/*
+
 # Object files
 *.o
 *.ko
@@ -16,3 +19,7 @@
 *.exe
 *.out
 *.app
+
+# Editor temp/backup files
+*~
+*.swp

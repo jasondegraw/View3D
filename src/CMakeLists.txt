@@ -1,4 +1,4 @@
-project(view3d)
+project(View3D_Exes)
 
 cmake_minimum_required(VERSION 2.8)
 
@@ -17,4 +17,4 @@ set(SRCS ctrans.c
          viewunob.c
          tmpstore.c)
 
-add_executable(view3d ${SRCS} ${SRCS_WITH_WARNINGS})
+add_executable(view3d ${SRCS})
