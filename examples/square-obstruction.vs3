@@ -1,0 +1,39 @@
+T Two squares with a square obstruction in between
+C encl=0 list=3
+F 3
+!
+!                   y
+!                   .
+!                   .
+!       8+          +2
+!        |\   12    |\
+!        | \   +    | \
+!        |  \  |\   |  \
+!        |  7+ | \11|   +3
+! z . . 5+---|-+--+-+1  |
+!         \  | 9\ |  \  |
+!          \ |   \|   \ |
+!           \|    +    \|
+!           6+    10     +4
+!                        .
+!                         .
+!                          x
+!
+!  #   x    y    z      coordinates of vertices
+V  1   0.   0.   0.
+V  2   1.   0.   0.
+V  3   1.   1.   0.
+V  4   0.   1.   0.
+V  5   0.   0.   1.
+V  6   1.   0.   1.
+V  7   1.   1.   1.
+V  8   0.   1.   1.
+V  9   0.   0.   .5
+V 10   .5   0.   .5
+V 11   .5   .5   .5
+V 12   0.   .5   .5
+!  #   v1  v2  v3  v4 base cmb  emit  name      surface data
+S  1    1   2   3   4   0   0   0.50  zeq0.0
+S  2    7   6   5   8   0   0   0.50  zeq1.0
+S  3    9  10  11  12   0   0   0.50  zeq0.5
+End of data

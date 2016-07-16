@@ -1,0 +1,40 @@
+T The unit cube
+C encl=1 list=3
+F 3
+!
+!  A Simple Cube Example
+!
+!                   y
+!                   .
+!                   .
+!       8+----------+2
+!        |\         |\
+!        | \        | \
+!        |  \       |  \
+!        |  7+----------+3
+! z . . 5+---|------+1  |
+!         \  |       \  |
+!          \ |        \ |
+!           \|         \|
+!           6+----------+4
+!                        .
+!                         .
+!                          x
+!
+!  #   x    y    z      coordinates of vertices
+V  1   0.   0.   0.
+V  2   1.   0.   0.
+V  3   1.   1.   0.
+V  4   0.   1.   0.
+V  5   0.   0.   1.
+V  6   1.   0.   1.
+V  7   1.   1.   1.
+V  8   0.   1.   1.
+!  #   v1  v2  v3  v4 base cmb  emit  name      surface data
+S  1    1   2   3   4   0   0   0.50  zeq0
+S  2    1   4   8   5   0   0   0.50  xeq0
+S  3    1   5   6   2   0   0   0.50  yeq0
+S  4    7   6   5   8   0   0   0.50  zeq1
+S  5    7   3   2   6   0   0   0.50  xeq1
+S  6    7   8   4   3   0   0   0.50  yeq1
+End of data
