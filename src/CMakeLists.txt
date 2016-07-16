@@ -2,6 +2,10 @@ project(View3D_Exes)
 
 cmake_minimum_required(VERSION 2.8)
 
+if(MSVC)
+  add_definitions( -D_CRT_SECURE_NO_DEPRECATE )
+endif()
+
 set(SRCS ctrans.c
          getdat.c
          heap.c
