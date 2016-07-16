@@ -35,7 +35,7 @@
 /*  Common Function Prototypes  */
 
 #ifndef COM_FUNCS
-# define COM_FUNCS
+#define COM_FUNCS
 
 /* functions in misc.c */
 IX error(IX severity, I1 *file, IX line, ...);

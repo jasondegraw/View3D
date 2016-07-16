@@ -44,7 +44,7 @@ typedef struct TMPBLOCK TMPBLOCK; /*!< Simplify declarations */
  */
 struct TMPBLOCK {
   struct TMPBLOCK *next; /*!< Pointer to the next block structure */
-  void *memory;         /*!< Pointer to allocated memory */
+  char *memory;         /*!< Pointer to allocated memory */
 };
 
 //! Block allocation storage structure
@@ -80,11 +80,15 @@ void *getMemory(TMPSTORE *s, I1 *file, IX line);
 //! Return a storage structure to unused state
 /*!
  * \param s storage structure to deallocate
+ * \param file character string of file in which call occurs
+ * \param line line number of the call
  */
 void cleanStore(TMPSTORE *s, I1 *file, IX line);
 //! Clean up and deallocate a storage structure
 /*!
  * \param s storage structure to deallocate
+ * \param file character string of file in which call occurs
+ * \param line line number of the call
  */
 void deleteStore(TMPSTORE *s, I1 *file, IX line);
 //! Write out a summary of a storage structure

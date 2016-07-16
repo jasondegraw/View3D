@@ -16,5 +16,10 @@ set(SRCS ctrans.c
          viewpp.c
          viewunob.c
          tmpstore.c)
+ 
+set(HDRS prtyp.h
+         view3d.h
+         tmpstore.h
+         types.h)
 
-add_executable(view3d ${SRCS})
+ add_executable(view3d ${HDRS} ${SRCS})
