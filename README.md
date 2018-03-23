@@ -8,7 +8,7 @@ This is View3D 4.0, a C language program for the calculation of geometric view f
 Documentation
 -------------
 
-This version is not intended to behave differently than versions 3.2 or 3.3.1. The documentation for those programs is avialable from a number of sources:
+This version is not intended to behave differently than versions 3.2 or 3.3.1. The documentation for those programs is available from a number of sources:
 
 * Version 3.2 has been included with the US Department of Energy's EnergyPlus for some time. To install the program and documentation, during the main EnergyPlus installation select the optional view factor installation. EnergyPlus is available at www.energyplus.gov.
 * Documentation for version 3.3.1 is available here: www.personal.psu.edu/jwd131/software/v3d33/manual/view3d33manual.html.
