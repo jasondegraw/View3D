@@ -1,7 +1,7 @@
 #
 #  A Simple Makefile for View3D (Windows version)
 #
-obj   = ctrans.obj getdat.obj heap.obj misc.obj polygn.obj readvf.obj savevf.obj test3d.obj v3main.obj view3d.obj viewobs.obj viewpp.obj viewunob.obj
+obj   = ctrans.obj getdat.obj heap.obj misc.obj polygn.obj readvf.obj savevf.obj test3d.obj tmpstore.obj v3main.obj view3d.obj viewobs.obj viewpp.obj viewunob.obj
 #
 progs = View3D
 #
