@@ -57,7 +57,7 @@ View3D 2.0 -- 1991 -- called VLITE for use with HLITE; conversion from
 Fortran to C\\
 View3D 3.0 -- 1996 -- search for accurate view factors; split into multiple
 programs\\
-View3D 3.1 -- 1999 -- adaptive integration – see NISTIR 6925\\
+View3D 3.1 -- 1999 -- adaptive integration, see NISTIR 6925\\
 View3D 3.2 -- 2002 -- new controls input for compatibility with anticipated
 version 4.0\\
 
@@ -250,9 +250,9 @@ enclosure to guarantee conservation of energy.
 \item\textbf{emit (0):} 1 indicates that diffuse reflectance effects will be
 included in the computed view factors (Hottel’s “script-F” view factors); 0
 indicates they will not, i.e., surfaces will be considered 'black'.
-\item\textbf{out (0):} view factor output file format - 1 = simple text file, 
-0 = binary file.
-\item\textbf{list (0):} computational summary written to the View3D.log file - 
+\item\textbf{out (0):} view factor output file format -- 0 = simple text file; 
+1 = binary file.
+\item\textbf{list (0):} computational summary written to the View3D.log file -- 
 0 gives minimal information; 1 gives slightly more; 2 prints all the view
 factors; 3 causes dumping of some intermediate values.
 \end{itemize}
