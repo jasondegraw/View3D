@@ -1,12 +1,16 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
-PROJECT(View3D)
+project(View3D)
 
-ADD_SUBDIRECTORY(src)
+set(BUILD_DOCUMENTATION OFF CACHE BOOL "Set this variable to ON to build documentation")
 
-FIND_PACKAGE(LATEX)
-IF(PDFLATEX_COMPILER)
-  ADD_SUBDIRECTORY(doc)
-ELSE(PDFLATEX_COMPILER)
-  MESSAGE(WARNING "pdflatex not found, documentation will not be built.")
-ENDIF(PDFLATEX_COMPILER)
+add_subdirectory(src)
+
+if(BUILD_DOCUMENTATION)
+  find_package(LATEX)
+  if(PDFLATEX_COMPILER)
+    add_subdirectory(doc)
+  else()
+    message(WARNING "pdflatex not found, documentation will not be built.")
+  endif()
+endif()
