@@ -26,4 +26,8 @@ set(HDRS prtyp.h
          tmpstore.h
          types.h)
 
- add_executable(view3d ${HDRS} ${SRCS})
+add_executable(view3d ${HDRS} ${SRCS})
+
+if(NOT MSVC)
+    target_link_libraries(view3d m)
+endif()
